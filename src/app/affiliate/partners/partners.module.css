@@ -1,0 +1,136 @@
+.partnersPage {
+  padding-bottom: var(--space-3xl);
+}
+
+/* ─── Page Hero ─── */
+.pageHero {
+  text-align: center;
+  padding: var(--space-3xl) 0 var(--space-2xl);
+  position: relative;
+  overflow: hidden;
+}
+
+.pageHero::before {
+  content: '';
+  position: absolute;
+  top: -120px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 400px;
+  background: radial-gradient(ellipse, rgba(108, 92, 231, 0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.pageTitle {
+  font-family: var(--font-heading);
+  font-size: 2.75rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: var(--space-md);
+  letter-spacing: -0.02em;
+}
+
+.pageSubtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.8;
+}
+
+/* ─── Partners Grid ─── */
+.partnersGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-lg);
+}
+
+.partnerCard {
+  aspect-ratio: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-smooth);
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+}
+
+.partnerCard::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-card);
+  opacity: 0;
+  transition: var(--transition-smooth);
+}
+
+.partnerCard:hover {
+  border-color: var(--border-accent);
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-glow-primary);
+}
+
+.partnerCard:hover::before {
+  opacity: 1;
+}
+
+.partnerLogo {
+  position: relative;
+  z-index: 1;
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1;
+  transition: var(--transition-smooth);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.partnerCard:hover .partnerLogo {
+  transform: scale(1.1);
+}
+
+.partnerLogoChar {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 800;
+  color: white;
+  background: var(--gradient-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.partnerName {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 1024px) {
+  .partnersGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .pageTitle {
+    font-size: 2rem;
+  }
+
+  .partnersGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

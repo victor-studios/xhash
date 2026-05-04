@@ -1,0 +1,101 @@
+.ticker {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1001;
+  height: var(--ticker-height, 32px);
+  background: linear-gradient(90deg, #0d0f1a 0%, #1a1040 50%, #0d0f1a 100%);
+  border-bottom: 1px solid rgba(108, 92, 231, 0.15);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.tickerTrack {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xl);
+  animation: ticker-scroll 45s linear infinite;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.tickerTrack:hover {
+  animation-play-state: paused;
+}
+
+.tickerItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  cursor: default;
+}
+
+.tickerIcon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.tickerIconFallback {
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+.tickerName {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+}
+
+.tickerSymbol {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.tickerPrice {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.tickerChange {
+  font-size: 0.65rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.positive {
+  color: #00e676;
+  background: rgba(0, 230, 118, 0.1);
+}
+
+.negative {
+  color: #ff4757;
+  background: rgba(255, 71, 87, 0.1);
+}
+
+.tickerDot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--border-accent);
+  flex-shrink: 0;
+}
+
+@keyframes ticker-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}

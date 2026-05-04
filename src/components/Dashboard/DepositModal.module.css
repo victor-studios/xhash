@@ -1,0 +1,51 @@
+.btcIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #F7931A, #FF8C00);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: white;
+}
+
+.qrSection {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-lg) 0;
+}
+
+.qrCode {
+  background: white;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.instruction {
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: var(--space-sm);
+}
+
+.network {
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--accent-green);
+  font-weight: 500;
+  margin-bottom: var(--space-lg);
+}
+
+.warning {
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--accent-gold);
+  line-height: 1.5;
+  margin-top: var(--space-sm);
+}

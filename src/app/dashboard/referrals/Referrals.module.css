@@ -1,0 +1,45 @@
+.infoBanner {
+  display: flex;
+  gap: var(--space-xl);
+  align-items: flex-start;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  margin-bottom: var(--space-xl);
+}
+
+.bannerIcon {
+  flex-shrink: 0;
+  width: 120px;
+  height: 100px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, rgba(108, 92, 231, 0.15), rgba(168, 85, 247, 0.1));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bannerText {
+  flex: 1;
+}
+
+.bannerText p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: var(--space-sm);
+}
+
+.bannerNote {
+  color: var(--accent-secondary) !important;
+  font-size: 0.82rem !important;
+}
+
+@media (max-width: 640px) {
+  .infoBanner {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}

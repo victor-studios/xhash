@@ -1,0 +1,185 @@
+.packageDetail {
+  padding: var(--space-2xl) 0 var(--space-4xl);
+}
+
+.packageTitle {
+  font-family: var(--font-heading);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-xl);
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.infoCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  transition: var(--transition-smooth);
+}
+
+.infoCard:hover {
+  border-color: var(--border-accent);
+}
+
+.infoLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.infoValue {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
+.infoValue.accent {
+  color: var(--accent-secondary);
+}
+
+/* Referral card spanning full width */
+.referralCard {
+  grid-column: 1 / -1;
+  max-width: 33.33%;
+}
+
+.purchaseRow {
+  display: flex;
+  gap: var(--space-lg);
+  align-items: center;
+  margin: var(--space-xl) 0;
+}
+
+.quantitySelector {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex: 1;
+}
+
+.qtyBtn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  color: white;
+  font-size: 1.25rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  border: none;
+}
+
+.qtyBtn:hover {
+  background: var(--accent-primary-light);
+  transform: scale(1.1);
+}
+
+.qtyInput {
+  width: 100%;
+  text-align: center;
+  padding: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  font-family: var(--font-mono);
+  margin: 0 var(--space-md);
+}
+
+.qtyInput:focus {
+  border-color: var(--accent-primary);
+  outline: none;
+}
+
+.buyNowBtn {
+  flex: 1;
+  padding: 14px 32px;
+  border-radius: var(--radius-full);
+  background: var(--gradient-green);
+  color: #000;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  border: none;
+  white-space: nowrap;
+}
+
+.buyNowBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow-green);
+}
+
+/* Details Section */
+.detailsSection {
+  margin-top: var(--space-3xl);
+}
+
+.detailsTitle {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-xl);
+}
+
+.detailsNote {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: var(--space-lg);
+  font-style: italic;
+}
+
+.detailBlock {
+  margin-bottom: var(--space-lg);
+}
+
+.detailBlockTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.detailBlockText {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+@media (max-width: 768px) {
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .referralCard {
+    max-width: 100%;
+  }
+
+  .purchaseRow {
+    flex-direction: column;
+  }
+
+  .quantitySelector {
+    width: 100%;
+  }
+
+  .buyNowBtn {
+    width: 100%;
+    text-align: center;
+  }
+}

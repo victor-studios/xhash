@@ -1,0 +1,213 @@
+/* ═══════════════════════════════════════════════════
+   Payment Partners — Auto-Scrolling Marquee
+   2 rows, opposite directions
+   ═══════════════════════════════════════════════════ */
+
+.partners {
+  padding: var(--space-3xl) 0 var(--space-4xl);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ─── Slider Wrapper ─── */
+.sliderWrapper {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  margin-top: var(--space-xl);
+}
+
+/* ─── Slider Row ─── */
+.sliderRow {
+  overflow: hidden;
+  width: 100%;
+  padding: var(--space-sm) 0;
+}
+
+.sliderRow + .sliderRow {
+  margin-top: var(--space-md);
+}
+
+/* ─── Slider Track ─── */
+.sliderTrack {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  width: max-content;
+  will-change: transform;
+}
+
+/* ─── Scroll Animations ─── */
+.scrollLeft {
+  animation: marqueeLeft 45s linear infinite;
+}
+
+.scrollRight {
+  animation: marqueeRight 45s linear infinite;
+}
+
+@keyframes marqueeLeft {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-33.333%);
+  }
+}
+
+@keyframes marqueeRight {
+  0% {
+    transform: translateX(-33.333%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* Pause on hover for the entire wrapper */
+.sliderWrapper:hover .sliderTrack {
+  animation-play-state: paused;
+}
+
+/* ─── Partner Card ─── */
+.partnerCard {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-xl);
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  min-width: 200px;
+  transition: var(--transition-smooth);
+  cursor: default;
+}
+
+.partnerCard:hover {
+  border-color: var(--accent-primary);
+  background: var(--bg-card-hover);
+  box-shadow: var(--shadow-glow-primary);
+  transform: translateY(-2px);
+}
+
+/* ─── Partner Logo ─── */
+.partnerLogo {
+  width: 72px;
+  height: 48px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  background: linear-gradient(
+    135deg,
+    rgba(108, 92, 231, 0.15) 0%,
+    rgba(0, 210, 255, 0.08) 100%
+  );
+  border: 1px solid rgba(108, 92, 231, 0.2);
+  color: var(--accent-primary-light);
+  transition: var(--transition-smooth);
+  padding: 4px;
+  overflow: hidden;
+}
+
+.partnerCard:hover .partnerLogo {
+  background: linear-gradient(
+    135deg,
+    rgba(108, 92, 231, 0.25) 0%,
+    rgba(0, 210, 255, 0.15) 100%
+  );
+  border-color: rgba(108, 92, 231, 0.4);
+  color: var(--accent-secondary);
+}
+
+.partnerLogo svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ─── Partner Name ─── */
+.partnerName {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  transition: var(--transition-smooth);
+  letter-spacing: 0.02em;
+}
+
+.partnerCard:hover .partnerName {
+  color: var(--text-primary);
+}
+
+/* ─── Fade Edges ─── */
+.fadeLeft,
+.fadeRight {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 120px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.fadeLeft {
+  left: 0;
+  background: linear-gradient(
+    to right,
+    var(--bg-primary) 0%,
+    transparent 100%
+  );
+}
+
+.fadeRight {
+  right: 0;
+  background: linear-gradient(
+    to left,
+    var(--bg-primary) 0%,
+    transparent 100%
+  );
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .partners {
+    padding: var(--space-2xl) 0 var(--space-3xl);
+  }
+
+  .partnerCard {
+    min-width: 160px;
+    padding: var(--space-sm) var(--space-md);
+    gap: var(--space-sm);
+  }
+
+  .partnerLogo {
+    width: 56px;
+    height: 38px;
+    padding: 3px;
+  }
+
+  .partnerLogo svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .partnerName {
+    font-size: 0.75rem;
+  }
+
+  .fadeLeft,
+  .fadeRight {
+    width: 60px;
+  }
+
+  .scrollLeft {
+    animation-duration: 30s;
+  }
+
+  .scrollRight {
+    animation-duration: 30s;
+  }
+}
