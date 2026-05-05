@@ -7,7 +7,7 @@ import {
   LayoutDashboard,
   Wallet,
   ArrowUpFromLine,
-  FileText,
+  ArrowLeftRight,
   ShoppingBag,
   Users,
   Settings,
@@ -18,10 +18,10 @@ import styles from './Sidebar.module.css';
 
 const sidebarLinks = [
   { label: 'Overview', href: '/dashboard', icon: LayoutDashboard },
+  { label: 'Orders', href: '/dashboard/orders', icon: ShoppingBag },
   { label: 'Deposit', href: '/dashboard/deposit', icon: Wallet },
   { label: 'Withdraw', href: '/dashboard/withdraw', icon: ArrowUpFromLine },
-  { label: 'Bills', href: '/dashboard/bills', icon: FileText },
-  { label: 'Orders', href: '/dashboard/orders', icon: ShoppingBag },
+  { label: 'Transactions', href: '/dashboard/bills', icon: ArrowLeftRight },
   { label: 'Referrals', href: '/dashboard/referrals', icon: Users },
   { label: 'Settings', href: '/dashboard/settings', icon: Settings },
 ];

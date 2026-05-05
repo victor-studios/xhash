@@ -3,11 +3,13 @@
 import { useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { Camera } from 'lucide-react';
+import { useToast } from '@/components/ui/Toast';
 import styles from './Settings.module.css';
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<'profile' | 'withdraw' | 'security'>('profile');
   const { user } = useAuth();
+  const { toast } = useToast();
 
   // Profile state
   const [displayName, setDisplayName] = useState(user?.name || '');
@@ -33,10 +35,61 @@ export default function SettingsPage() {
     security: 'Security Settings',
   };
 
+  /* ─── Save Handlers ─── */
+  const handleSaveProfile = () => {
+    if (!displayName.trim() || !username.trim() || !email.trim()) {
+      toast({ variant: 'error', title: 'Missing Fields', message: 'Please fill in all profile fields.' });
+      return;
+    }
+    if (!email.includes('@')) {
+      toast({ variant: 'error', title: 'Invalid Email', message: 'Please enter a valid email address.' });
+      return;
+    }
+    toast({ variant: 'success', title: 'Profile Updated', message: 'Your profile details have been saved.' });
+  };
+
+  const handleSaveWithdraw = () => {
+    if (!paymentMethod) {
+      toast({ variant: 'error', title: 'Payment Method Required', message: 'Please select a payment method.' });
+      return;
+    }
+    if (!walletAddress.trim()) {
+      toast({ variant: 'error', title: 'Wallet Address Required', message: 'Please enter your wallet address.' });
+      return;
+    }
+    if (!withdrawPassword) {
+      toast({ variant: 'error', title: 'Password Required', message: 'Please enter your password to confirm.' });
+      return;
+    }
+    toast({ variant: 'success', title: 'Withdraw Settings Saved', message: 'Your withdrawal preferences have been updated.' });
+  };
+
+  const handleSaveSecurity = () => {
+    if (!currentPassword) {
+      toast({ variant: 'error', title: 'Current Password Required', message: 'Please enter your current password.' });
+      return;
+    }
+    if (!newPassword || newPassword.length < 6) {
+      toast({ variant: 'error', title: 'Weak Password', message: 'New password must be at least 6 characters.' });
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast({ variant: 'error', title: 'Passwords Don\'t Match', message: 'New password and confirmation must match.' });
+      return;
+    }
+    toast({ variant: 'success', title: 'Password Updated', message: 'Your password has been changed successfully.' });
+    setCurrentPassword('');
+    setNewPassword('');
+    setConfirmPassword('');
+    setSecurityCode('');
+  };
+
+  const handleSendCode = () => {
+    toast({ variant: 'info', title: 'Code Sent', message: 'A verification code has been sent to your email.' });
+  };
+
   return (
     <>
-      <h1 className="dash-page-title">{getTitleMap[activeTab]}</h1>
-
       {/* Tabs */}
       <div className="dash-tabs">
         <button
@@ -94,7 +147,7 @@ export default function SettingsPage() {
                 </div>
 
                 <p className={styles.changeLabel}>Change user details</p>
-                <button className="dash-btn-green" id="save-profile-btn">
+                <button className="dash-btn-green" id="save-profile-btn" onClick={handleSaveProfile}>
                   Save changes
                 </button>
               </div>
@@ -155,7 +208,7 @@ export default function SettingsPage() {
                   onChange={(e) => setVerifyCode(e.target.value)}
                   id="settings-verify-code"
                 />
-                <button className="dash-inline-btn" id="settings-send-code-btn">
+                <button className="dash-inline-btn" id="settings-send-code-btn" onClick={handleSendCode}>
                   Send Code
                 </button>
               </div>
@@ -170,7 +223,7 @@ export default function SettingsPage() {
               />
             </div>
 
-            <button className="dash-btn-green" id="settings-save-withdraw">
+            <button className="dash-btn-green" id="settings-save-withdraw" onClick={handleSaveWithdraw}>
               Save Changes
             </button>
           </>
@@ -216,7 +269,7 @@ export default function SettingsPage() {
                   onChange={(e) => setSecurityCode(e.target.value)}
                   id="settings-security-code"
                 />
-                <button className="dash-inline-btn" id="settings-send-security-code">
+                <button className="dash-inline-btn" id="settings-send-security-code" onClick={handleSendCode}>
                   Send Code
                 </button>
               </div>
@@ -232,12 +285,21 @@ export default function SettingsPage() {
                 type="checkbox"
                 className="toggle"
                 checked={twoFA}
-                onChange={(e) => setTwoFA(e.target.checked)}
+                onChange={(e) => {
+                  setTwoFA(e.target.checked);
+                  toast({
+                    variant: 'info',
+                    title: e.target.checked ? '2FA Enabled' : '2FA Disabled',
+                    message: e.target.checked
+                      ? 'Two-factor authentication has been turned on.'
+                      : 'Two-factor authentication has been turned off.',
+                  });
+                }}
                 id="settings-2fa-toggle"
               />
             </div>
 
-            <button className="dash-btn-green" id="settings-save-security">
+            <button className="dash-btn-green" id="settings-save-security" onClick={handleSaveSecurity}>
               Save Changes
             </button>
           </>

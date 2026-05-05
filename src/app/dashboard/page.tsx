@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Copy, Wallet, ArrowUpFromLine, TrendingUp, Users, Trophy, CheckSquare, AlertTriangle, ListChecks, Activity, Cpu, Clock, Zap } from 'lucide-react';
+import { useToast } from '@/components/ui/Toast';
 import styles from './Dashboard.module.css';
 
 // Mock weekly mining data for the graph
@@ -18,13 +19,16 @@ const weeklyData = [
 const maxVal = Math.max(...weeklyData.map(d => Math.max(d.earned, d.mined)));
 
 export default function DashboardPage() {
+  const { toast } = useToast();
+
   const handleCopy = () => {
     navigator.clipboard.writeText('https://xhash.io/r/kr950MG425');
+    toast({ variant: 'success', title: 'Copied!', message: 'Affiliate link copied to clipboard.' });
   };
 
   return (
     <>
-      <h1 className="dash-page-title">Overview</h1>
+      {/* Affiliate Link */}
 
       {/* Balance Cards */}
       <div className={styles.balanceRow}>

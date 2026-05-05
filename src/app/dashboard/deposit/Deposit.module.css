@@ -1,0 +1,417 @@
+/* ═══════════════════════════════════════════════════
+   Deposit Page — Custom Styles
+   ═══════════════════════════════════════════════════ */
+
+/* ─── Custom Crypto Dropdown ─── */
+.cryptoDropdown {
+  position: relative;
+  width: 100%;
+}
+
+.dropdownTrigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  text-align: left;
+}
+
+.dropdownTrigger:hover {
+  border-color: var(--border-card);
+}
+
+.dropdownTrigger:focus,
+.dropdownTrigger.open {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+  outline: none;
+}
+
+.dropdownArrow {
+  margin-left: auto;
+  transition: transform 0.2s ease;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.dropdownArrow.rotated {
+  transform: rotate(180deg);
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: var(--bg-card-elevated);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-md);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  max-height: 320px;
+  overflow-y: auto;
+  animation: dropIn 0.2s ease;
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  color: var(--text-primary);
+}
+
+.dropdownItem:hover {
+  background: rgba(108, 92, 231, 0.08);
+}
+
+.dropdownItem.selected {
+  background: rgba(108, 92, 231, 0.12);
+}
+
+.dropdownItem:not(:last-child) {
+  border-bottom: 1px solid rgba(30, 35, 72, 0.3);
+}
+
+/* ─── Crypto Icon ─── */
+.cryptoIconBadge {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+
+.cryptoIconSmall {
+  width: 26px;
+  height: 26px;
+  font-size: 0.72rem;
+}
+
+.cryptoName {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.cryptoChain {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+
+/* ─── Bank Transfer Card ─── */
+.bankCard {
+  background: var(--bg-card-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-md);
+}
+
+.bankRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(30, 35, 72, 0.3);
+}
+
+.bankRow:last-child {
+  border-bottom: none;
+}
+
+.bankLabel {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.bankValue {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.bankCopyBtn {
+  padding: 4px 8px;
+  background: none;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  margin-left: 8px;
+}
+
+.bankCopyBtn:hover {
+  border-color: var(--accent-primary);
+  color: var(--text-primary);
+}
+
+.bankNote {
+  font-size: 0.82rem;
+  color: var(--accent-gold);
+  line-height: 1.6;
+  margin-top: var(--space-md);
+  text-align: center;
+}
+
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══════════════════════════════════════════════════
+   Split Layout — viewport-locked, zero page scroll
+   ═══════════════════════════════════════════════════ */
+.splitLayout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: var(--space-xl);
+  /* Use viewport calc so it doesn't depend on parent chain */
+  height: calc(100vh - var(--navbar-height) - var(--ticker-height, 32px) - var(--space-xl) * 2);
+  overflow: hidden;
+}
+
+/* Left column — flex column so balance card can grow */
+.formSection {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Balance card stretches to fill remaining vertical space */
+.balanceCardStretch {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2xl);
+}
+
+.balanceCardStretch h3 {
+  font-family: var(--font-heading);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-bottom: var(--space-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.balanceAmount {
+  font-family: var(--font-mono);
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  background: var(--gradient-green);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.formBody {
+  flex-shrink: 0;
+}
+
+/* ─── History Panel — fills right column ─── */
+.historyPanel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.historyHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-lg) var(--space-lg) var(--space-md);
+  border-bottom: 1px solid var(--border-default);
+  flex-shrink: 0;
+}
+
+.historyHeader h3 {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.historyCount {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  background: var(--bg-input);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-weight: 500;
+}
+
+.historyList {
+  overflow-y: auto;
+  flex: 1;
+  padding: var(--space-sm);
+}
+
+.historyList::-webkit-scrollbar {
+  width: 4px;
+}
+.historyList::-webkit-scrollbar-track {
+  background: transparent;
+}
+.historyList::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: 4px;
+}
+.historyList::-webkit-scrollbar-thumb:hover {
+  background: var(--border-card);
+}
+
+.historyItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.historyItem:hover {
+  background: rgba(108, 92, 231, 0.06);
+}
+
+.historyItem:not(:last-child) {
+  border-bottom: 1px solid rgba(30, 35, 72, 0.2);
+}
+
+.historyItemLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.historyStatusIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.historyItemInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.historyStatus {
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.historyTime {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.historyItemRight {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.historyAmount {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.historyCrypto {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.uploadBadge {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--gradient-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #070A14;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 1100px) {
+  .splitLayout {
+    grid-template-columns: 1fr 280px;
+  }
+}
+
+@media (max-width: 900px) {
+  .splitLayout {
+    grid-template-columns: 1fr;
+    height: auto;
+    overflow: visible;
+  }
+
+  .formSection {
+    height: auto;
+    overflow: visible;
+  }
+
+  .historyPanel {
+    height: 400px;
+  }
+
+  .balanceCardStretch {
+    flex: none;
+    padding: var(--space-xl);
+  }
+}

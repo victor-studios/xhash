@@ -6,7 +6,8 @@
 /* ─── Layout ─── */
 .dashboard-wrapper {
   display: flex;
-  min-height: calc(100vh - var(--navbar-height));
+  height: calc(100vh - var(--navbar-height) - var(--ticker-height, 32px));
+  overflow: hidden;
   background: var(--bg-primary);
 }
 
@@ -15,7 +16,8 @@
   padding: var(--space-xl) var(--space-2xl);
   min-width: 0;
   margin-left: 210px;
-  min-height: calc(100vh - var(--navbar-height));
+  height: 100%;
+  overflow-y: auto;
 }
 
 /* ─── Page Header ─── */
@@ -74,6 +76,20 @@
   border-color: var(--accent-primary);
   box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
   outline: none;
+}
+
+/* Override browser autofill light backgrounds */
+.dash-input:-webkit-autofill,
+.dash-input:-webkit-autofill:hover,
+.dash-input:-webkit-autofill:focus,
+.dash-input:-webkit-autofill:active,
+.dash-select:-webkit-autofill,
+.dash-select:-webkit-autofill:hover,
+.dash-select:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px var(--bg-input) inset !important;
+  -webkit-text-fill-color: var(--text-primary) !important;
+  transition: background-color 5000s ease-in-out 0s;
+  caret-color: var(--text-primary);
 }
 
 .dash-select {

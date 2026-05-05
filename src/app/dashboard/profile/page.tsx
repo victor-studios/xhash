@@ -13,7 +13,7 @@ export default function ProfilePage() {
 
   return (
     <>
-      <h1 className="dash-page-title">Profile details</h1>
+      {/* Profile */}
 
       <div className="dash-card">
         <div className={styles.profileForm}>

@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   title: 'XHash — GPU-Powered Crypto Mining Platform',
   description: 'Start mining cryptocurrency today with XHash. No hardware needed. Access GPU-powered compute, track real-time performance, and earn daily returns with our mining packages.',
   keywords: ['crypto mining', 'GPU mining', 'bitcoin mining', 'cloud mining', 'XHash', 'cryptocurrency'],
+  icons: {
+    icon: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({

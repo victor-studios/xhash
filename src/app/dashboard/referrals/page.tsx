@@ -1,6 +1,7 @@
 'use client';
 
 import { Copy, Users, CheckSquare, TrendingUp } from 'lucide-react';
+import { useToast } from '@/components/ui/Toast';
 import styles from './Referrals.module.css';
 
 const referralHistory = [
@@ -11,14 +12,15 @@ const referralHistory = [
 ];
 
 export default function ReferralsPage() {
+  const { toast } = useToast();
+
   const handleCopy = () => {
     navigator.clipboard.writeText('https://xhash.io/r/kr950MG425');
+    toast({ variant: 'success', title: 'Copied!', message: 'Affiliate link copied to clipboard.' });
   };
 
   return (
     <>
-      <h1 className="dash-page-title">Referrals</h1>
-
       {/* Info Banner */}
       <div className={styles.infoBanner}>
         <div className={styles.bannerIcon}>

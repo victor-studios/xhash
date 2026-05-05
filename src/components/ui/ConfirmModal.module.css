@@ -1,0 +1,219 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(7, 10, 20, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  animation: cmFadeIn 0.2s ease;
+}
+
+.box {
+  width: 100%;
+  max-width: 440px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl);
+  position: relative;
+  animation: cmScaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  text-align: center;
+}
+
+/* ─── Icon ─── */
+.iconWrapper {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--space-lg);
+}
+
+.iconPurchase {
+  background: rgba(0, 230, 118, 0.12);
+  color: var(--accent-green);
+  border: 2px solid rgba(0, 230, 118, 0.2);
+}
+
+.iconWithdraw {
+  background: rgba(255, 140, 0, 0.12);
+  color: var(--accent-orange);
+  border: 2px solid rgba(255, 140, 0, 0.2);
+}
+
+.iconDanger {
+  background: rgba(255, 71, 87, 0.12);
+  color: var(--accent-red);
+  border: 2px solid rgba(255, 71, 87, 0.2);
+}
+
+.iconInfo {
+  background: rgba(108, 92, 231, 0.12);
+  color: var(--accent-primary-light);
+  border: 2px solid rgba(108, 92, 231, 0.2);
+}
+
+.iconSuccess {
+  background: rgba(0, 230, 118, 0.12);
+  color: var(--accent-green);
+  border: 2px solid rgba(0, 230, 118, 0.2);
+}
+
+/* ─── Content ─── */
+.title {
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.message {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: var(--space-xl);
+}
+
+/* ─── Detail Rows ─── */
+.details {
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+  margin-bottom: var(--space-xl);
+  text-align: left;
+}
+
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(30, 35, 72, 0.3);
+}
+
+.detailRow:last-child {
+  border-bottom: none;
+}
+
+.detailLabel {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.detailValue {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.detailValueAccent {
+  color: var(--accent-green);
+}
+
+/* ─── Buttons ─── */
+.actions {
+  display: flex;
+  gap: var(--space-md);
+}
+
+.btnCancel {
+  flex: 1;
+  padding: 12px 24px;
+  background: transparent;
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.btnCancel:hover {
+  border-color: var(--accent-primary);
+  background: rgba(108, 92, 231, 0.08);
+}
+
+.btnConfirm {
+  flex: 1;
+  padding: 12px 24px;
+  background: var(--gradient-primary);
+  border: none;
+  border-radius: var(--radius-md);
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.btnConfirm:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-glow-primary);
+}
+
+.btnConfirmGreen {
+  background: var(--gradient-green);
+  color: #070A14;
+}
+
+.btnConfirmGreen:hover {
+  box-shadow: var(--shadow-glow-green);
+}
+
+.btnConfirmDanger {
+  background: linear-gradient(135deg, var(--accent-red), #e03e4e);
+}
+
+.btnConfirmDanger:hover {
+  box-shadow: 0 0 20px rgba(255, 71, 87, 0.3);
+}
+
+/* ─── Single-button (success result) ─── */
+.btnSingle {
+  width: 100%;
+  padding: 12px 24px;
+  background: var(--gradient-green);
+  border: none;
+  border-radius: var(--radius-md);
+  color: #070A14;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.btnSingle:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-glow-green);
+}
+
+/* ─── Animations ─── */
+@keyframes cmFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes cmScaleIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 480px) {
+  .box {
+    margin: 0 var(--space-md);
+  }
+
+  .actions {
+    flex-direction: column-reverse;
+  }
+}

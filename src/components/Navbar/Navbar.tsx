@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { navLinks } from '@/data/content';
 import { User, LayoutDashboard } from 'lucide-react';
+import XHashLogo from '@/components/XHashLogo/XHashLogo';
 import styles from './Navbar.module.css';
 
 export default function Navbar() {
@@ -35,7 +36,7 @@ export default function Navbar() {
     <nav className={`${styles.navbar} ${isScrolled ? styles.scrolled : ''}`} id="main-navbar">
       <div className={styles.navbarInner}>
         <Link href="/" className={styles.logo}>
-          XHash
+          <XHashLogo height={28} />
         </Link>
 
         <div className={styles.navLinks}>

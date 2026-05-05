@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import XHashLogo from '@/components/XHashLogo/XHashLogo';
 import styles from './Footer.module.css';
 
 export default function Footer() {
@@ -7,7 +8,7 @@ export default function Footer() {
       <div className="container">
         <div className={styles.footerGrid}>
           <div className={styles.footerBrand}>
-            <div className={styles.brandName}>XHash</div>
+            <XHashLogo height={30} />
             <p className={styles.brandDescription}>
               We provide GPU-powered compute solutions for cryptocurrency mining online without 
               requiring direct participation or ownership of equipment.

@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { MiningPackage } from '@/types';
+import { useToast } from '@/components/ui/Toast';
+import ConfirmModal from '@/components/ui/ConfirmModal';
 import styles from './PackageDetail.module.css';
 
 interface PackageDetailProps {
@@ -10,6 +12,25 @@ interface PackageDetailProps {
 
 export default function PackageDetail({ pkg }: PackageDetailProps) {
   const [quantity, setQuantity] = useState(1);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const { toast } = useToast();
+
+  const handleBuyNow = () => {
+    setShowConfirm(true);
+  };
+
+  const handleConfirmPurchase = () => {
+    setShowConfirm(false);
+    setShowSuccess(true);
+    toast({
+      variant: 'success',
+      title: 'Order Placed!',
+      message: `Your ${pkg.name} mining contract is now active.`,
+    });
+  };
+
+  const orderId = `XH-${Date.now().toString(36).toUpperCase().slice(-6)}`;
 
   return (
     <div className={styles.packageDetail}>
@@ -72,7 +93,7 @@ export default function PackageDetail({ pkg }: PackageDetailProps) {
               +
             </button>
           </div>
-          <button className={styles.buyNowBtn} id="buy-now-button">
+          <button className={styles.buyNowBtn} id="buy-now-button" onClick={handleBuyNow}>
             Buy Now
           </button>
         </div>
@@ -119,6 +140,45 @@ export default function PackageDetail({ pkg }: PackageDetailProps) {
           </div>
         </div>
       </div>
+
+      {/* Purchase Confirmation Modal */}
+      {showConfirm && (
+        <ConfirmModal
+          variant="purchase"
+          title="Confirm Purchase"
+          message={`You are about to purchase ${quantity}x ${pkg.name} mining contract.`}
+          details={[
+            { label: 'Package', value: pkg.name },
+            { label: 'Quantity', value: String(quantity) },
+            { label: 'Price Each', value: pkg.totalPrice },
+            { label: 'Duration', value: pkg.duration },
+            { label: 'Daily Rate', value: pkg.dailyRate },
+            { label: 'Expected Return', value: pkg.fixedReturn, accent: true },
+          ]}
+          confirmLabel="Confirm Purchase"
+          cancelLabel="Cancel"
+          onConfirm={handleConfirmPurchase}
+          onCancel={() => setShowConfirm(false)}
+        />
+      )}
+
+      {/* Purchase Success Modal */}
+      {showSuccess && (
+        <ConfirmModal
+          variant="success"
+          title="Purchase Successful!"
+          message="Your mining contract is now active. You will start receiving daily returns within 24 hours."
+          details={[
+            { label: 'Order ID', value: orderId },
+            { label: 'Package', value: pkg.name },
+            { label: 'Status', value: 'Active', accent: true },
+            { label: 'Daily Return', value: pkg.dailyRate },
+          ]}
+          confirmLabel="Got it"
+          onCancel={() => setShowSuccess(false)}
+          singleAction
+        />
+      )}
     </div>
   );
 }

@@ -1,0 +1,15 @@
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.text {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  color: inherit;
+  white-space: nowrap;
+}

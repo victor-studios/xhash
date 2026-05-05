@@ -1,0 +1,272 @@
+/* ═══════════════════════════════════════════════════
+   Orders Page — Package Cards
+   ═══════════════════════════════════════════════════ */
+
+.ordersGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-lg);
+}
+
+/* ─── Card ─── */
+.orderCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  position: relative;
+  transition: var(--transition-smooth);
+  overflow: hidden;
+}
+
+.orderCard:hover {
+  transform: translateY(-4px);
+  border-color: var(--border-accent);
+  box-shadow: var(--shadow-glow-primary);
+}
+
+.orderCard.ended {
+  opacity: 0.7;
+}
+
+.orderCard.ended:hover {
+  opacity: 1;
+  box-shadow: none;
+}
+
+/* ─── Status Badge ─── */
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-md);
+}
+
+.badgeActive {
+  background: rgba(0, 230, 118, 0.1);
+  color: var(--accent-green);
+  border: 1px solid rgba(0, 230, 118, 0.25);
+}
+
+.badgeEnded {
+  background: rgba(107, 111, 141, 0.1);
+  color: var(--text-muted);
+  border: 1px solid rgba(107, 111, 141, 0.25);
+}
+
+.statusDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.badgeActive .statusDot {
+  background: var(--accent-green);
+  box-shadow: 0 0 6px rgba(0, 230, 118, 0.6);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.badgeEnded .statusDot {
+  background: var(--text-muted);
+}
+
+/* ─── Header ─── */
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-lg);
+}
+
+.cardName {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.cardSubtitle {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 3px;
+}
+
+.cryptoIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+
+/* ─── Progress ─── */
+.progressSection {
+  margin-bottom: var(--space-md);
+}
+
+.progressLabel {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.progressPercent {
+  color: var(--accent-green);
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+
+.progressTrack {
+  width: 100%;
+  height: 6px;
+  background: var(--bg-primary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--gradient-green);
+  border-radius: var(--radius-full);
+  transition: width 1s ease;
+  box-shadow: 0 0 8px rgba(0, 230, 118, 0.3);
+}
+
+/* ─── Stats ─── */
+.cardStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.cardStat {
+  background: var(--bg-card-elevated);
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm) var(--space-xs);
+  text-align: center;
+}
+
+.statLabel {
+  display: block;
+  font-size: 0.63rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 3px;
+}
+
+.statValue {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+/* ─── Footer ─── */
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border-default);
+}
+
+.footerDates {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dateRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.dateLabel {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  min-width: 68px;
+}
+
+.dateValue {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
+.earnedSection {
+  text-align: right;
+}
+
+.earnedLabel {
+  display: block;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 2px;
+}
+
+.earnedValue {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
+.earnedActive {
+  color: var(--accent-green);
+}
+
+/* ─── Empty State ─── */
+.emptyState {
+  text-align: center;
+  padding: var(--space-4xl) var(--space-xl);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* ─── Pulse Animation ─── */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 1024px) {
+  .ordersGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .ordersGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .cardFooter {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .earnedSection {
+    text-align: left;
+  }
+}
