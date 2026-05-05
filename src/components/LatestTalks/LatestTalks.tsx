@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { blogPostsFull } from '@/data/blog-posts';
+import { sortedBlogPosts } from '@/data/blog-posts';
 import styles from './LatestTalks.module.css';
 
 export default function LatestTalks() {
@@ -12,7 +12,7 @@ export default function LatestTalks() {
         </div>
 
         <div className={styles.talksGrid}>
-          {blogPostsFull.map((post) => (
+          {sortedBlogPosts.slice(0, 4).map((post) => (
             <Link key={post.id} href={`/blog/${post.slug}`} className={styles.talkCard}>
               <div className={styles.talkImage}>
                 <Image

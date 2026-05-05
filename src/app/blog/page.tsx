@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Calendar, ArrowRight } from 'lucide-react';
-import { blogPostsFull } from '@/data/blog-posts';
+import { sortedBlogPosts } from '@/data/blog-posts';
 import styles from './blog.module.css';
 
 export const metadata: Metadata = {
@@ -11,7 +11,21 @@ export const metadata: Metadata = {
     'Stay updated with the latest crypto mining news, market analysis, educational guides, and platform updates from XHash.',
 };
 
-export default function BlogPage() {
+interface PageProps {
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+export default async function BlogPage(props: PageProps) {
+  const searchParams = await props.searchParams;
+  const pageStr = searchParams?.page;
+  const currentPage = parseInt(typeof pageStr === 'string' ? pageStr : '1', 10);
+  const limit = 18;
+  const startIndex = (currentPage - 1) * limit;
+  const endIndex = startIndex + limit;
+  
+  const currentPosts = sortedBlogPosts.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(sortedBlogPosts.length / limit);
+
   return (
     <div className={styles.blogPage}>
       <div className="container">
@@ -28,7 +42,7 @@ export default function BlogPage() {
 
         {/* Blog Grid */}
         <div className={styles.blogGrid} id="blog-grid">
-          {blogPostsFull.map((post) => (
+          {currentPosts.map((post) => (
             <Link
               key={post.id}
               href={`/blog/${post.slug}`}
@@ -61,6 +75,25 @@ export default function BlogPage() {
             </Link>
           ))}
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className={styles.pagination}>
+            {currentPage > 1 && (
+              <Link href={`/blog?page=${currentPage - 1}`} className={styles.paginationLink}>
+                Previous
+              </Link>
+            )}
+            <span className={styles.paginationInfo}>
+              Page {currentPage} of {totalPages}
+            </span>
+            {currentPage < totalPages && (
+              <Link href={`/blog?page=${currentPage + 1}`} className={styles.paginationLink}>
+                Next
+              </Link>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
