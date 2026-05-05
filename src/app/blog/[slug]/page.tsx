@@ -1,16 +1,10 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { Calendar, ArrowLeft } from 'lucide-react';
+import { Calendar, ArrowLeft, Tag } from 'lucide-react';
 import { blogPostsFull } from '@/data/blog-posts';
 import styles from './blogDetail.module.css';
-
-const blogIcons: Record<string, string> = {
-  'future-of-gpu-mining-2026': '⛏️',
-  'crypto-market-analysis-what-to-expect': '📊',
-  'understanding-hash-rates-profitability': '🔗',
-  'bitcoin-halving-impact-on-miners': '₿',
-};
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -30,6 +24,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: `${post.title} — XHash Blog`,
     description: post.excerpt,
+    openGraph: {
+      images: [post.image],
+    },
   };
 }
 
@@ -41,8 +38,6 @@ export default async function BlogDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  const heroIcon = blogIcons[post.slug] || '📰';
-
   /* Determine if a content block is a sub-heading (short, no period) */
   function isSubHeading(text: string) {
     return text.length < 60 && !text.endsWith('.');
@@ -51,20 +46,37 @@ export default async function BlogDetailPage({ params }: PageProps) {
   return (
     <div className={styles.blogDetail}>
       <div className="container">
+
         {/* Hero Image */}
-        <div className={styles.heroImage}>{heroIcon}</div>
+        <div className={styles.heroImage}>
+          <Image
+            src={post.image}
+            alt={post.title}
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, 900px"
+            className={styles.heroImg}
+          />
+          <div className={styles.heroOverlay} />
+        </div>
 
         {/* Article */}
         <article className={styles.articleWrapper}>
-          <h1 className={styles.articleTitle}>{post.title}</h1>
-
           <div className={styles.articleMeta}>
             <span className={styles.metaDate}>
               <Calendar size={14} />
               {post.date}
             </span>
-            <span className={styles.metaCategory}>{post.category}</span>
+            <span className={styles.metaCategory}>
+              <Tag size={11} />
+              {post.category}
+            </span>
           </div>
+
+          <h1 className={styles.articleTitle}>{post.title}</h1>
+          <p className={styles.articleLead}>{post.excerpt}</p>
+
+          <div className={styles.divider} />
 
           <div className={styles.articleBody}>
             {post.content.map((block, index) =>

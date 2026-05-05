@@ -1,13 +1,7 @@
 import Image from 'next/image';
-import { blogPosts } from '@/data/content';
+import Link from 'next/link';
+import { blogPostsFull } from '@/data/blog-posts';
 import styles from './LatestTalks.module.css';
-
-const blogImages = [
-  '/images/blog-gpu-mining.png',
-  '/images/blog-market-analysis.png',
-  '/images/blog-hash-rates.png',
-  '/images/blog-bitcoin-halving.png',
-];
 
 export default function LatestTalks() {
   return (
@@ -18,11 +12,11 @@ export default function LatestTalks() {
         </div>
 
         <div className={styles.talksGrid}>
-          {blogPosts.map((post, index) => (
-            <article key={post.id} className={styles.talkCard}>
+          {blogPostsFull.map((post) => (
+            <Link key={post.id} href={`/blog/${post.slug}`} className={styles.talkCard}>
               <div className={styles.talkImage}>
                 <Image
-                  src={blogImages[index] || blogImages[0]}
+                  src={post.image}
                   alt={post.title}
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
@@ -36,7 +30,7 @@ export default function LatestTalks() {
                 <p className={styles.talkExcerpt}>{post.excerpt}</p>
                 <div className={styles.talkDate}>{post.date}</div>
               </div>
-            </article>
+            </Link>
           ))}
         </div>
       </div>

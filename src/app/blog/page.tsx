@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Calendar, ArrowRight } from 'lucide-react';
 import { blogPostsFull } from '@/data/blog-posts';
 import styles from './blog.module.css';
@@ -9,8 +10,6 @@ export const metadata: Metadata = {
   description:
     'Stay updated with the latest crypto mining news, market analysis, educational guides, and platform updates from XHash.',
 };
-
-const blogIcons = ['⛏️', '📊', '🔗', '₿'];
 
 export default function BlogPage() {
   return (
@@ -29,14 +28,21 @@ export default function BlogPage() {
 
         {/* Blog Grid */}
         <div className={styles.blogGrid} id="blog-grid">
-          {blogPostsFull.map((post, index) => (
+          {blogPostsFull.map((post) => (
             <Link
               key={post.id}
               href={`/blog/${post.slug}`}
               className={styles.blogCard}
             >
               <div className={styles.blogCardImage}>
-                {blogIcons[index] || '📰'}
+                <Image
+                  src={post.image}
+                  alt={post.title}
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className={styles.blogCardImg}
+                />
+                <div className={styles.blogCardImgOverlay} />
               </div>
               <div className={styles.blogCardContent}>
                 <div className={styles.blogCardMeta}>

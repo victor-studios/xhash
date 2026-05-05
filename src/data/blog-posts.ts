@@ -16,7 +16,7 @@ export const blogPostsFull: BlogPostFull[] = [
     title: 'The Future of GPU Mining in 2026',
     excerpt:
       'Explore how GPU mining is evolving with new algorithms and energy-efficient hardware.',
-    image: '/images/blog-1.jpg',
+    image: '/images/blog-gpu-mining.png',
     date: 'May 1, 2026',
     category: 'Mining',
     content: [
@@ -35,7 +35,7 @@ export const blogPostsFull: BlogPostFull[] = [
     title: 'Crypto Market Analysis: What to Expect',
     excerpt:
       'Expert insights into cryptocurrency market trends and predictions for the coming quarter.',
-    image: '/images/blog-2.jpg',
+    image: '/images/blog-market-analysis.png',
     date: 'Apr 28, 2026',
     category: 'Analysis',
     content: [
@@ -54,7 +54,7 @@ export const blogPostsFull: BlogPostFull[] = [
     title: 'Understanding Hash Rates & Profitability',
     excerpt:
       'A comprehensive guide to hash rates, difficulty adjustments, and maximizing your mining returns.',
-    image: '/images/blog-3.jpg',
+    image: '/images/blog-hash-rates.png',
     date: 'Apr 25, 2026',
     category: 'Education',
     content: [
@@ -74,7 +74,7 @@ export const blogPostsFull: BlogPostFull[] = [
     title: 'Bitcoin Halving Impact on Miners',
     excerpt:
       'How the latest halving event affects mining profitability and what strategies to adopt.',
-    image: '/images/blog-4.jpg',
+    image: '/images/blog-bitcoin-halving.png',
     date: 'Apr 20, 2026',
     category: 'Bitcoin',
     content: [

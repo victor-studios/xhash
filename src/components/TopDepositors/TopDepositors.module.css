@@ -2,70 +2,7 @@
   padding: var(--space-4xl) 0;
 }
 
-.scrollContainer {
-  overflow-x: auto;
-  padding-bottom: var(--space-md);
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.scrollContainer::-webkit-scrollbar {
-  display: none;
-}
-
-.depositorTrack {
-  display: flex;
-  gap: var(--space-lg);
-  min-width: max-content;
-}
-
-.depositorCard {
-  min-width: 200px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-card);
-  border-radius: var(--radius-lg);
-  padding: var(--space-lg);
-  text-align: center;
-  transition: var(--transition-smooth);
-  flex-shrink: 0;
-}
-
-.depositorCard:hover {
-  border-color: var(--border-accent);
-  transform: translateY(-3px);
-}
-
-.flag {
-  font-size: 2.5rem;
-  margin-bottom: var(--space-sm);
-}
-
-.depositorName {
-  font-size: 0.85rem;
-  font-family: var(--font-mono);
-  color: var(--text-secondary);
-  margin-bottom: 4px;
-}
-
-.depositorCountry {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  margin-bottom: var(--space-sm);
-}
-
-.depositorAmount {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--accent-green);
-  font-family: var(--font-mono);
-}
-
-.depositorDate {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  margin-top: 4px;
-}
-
+/* ─── Tabs ─── */
 .tabs {
   display: flex;
   gap: var(--space-md);
@@ -74,23 +11,126 @@
 }
 
 .tab {
-  padding: 8px 20px;
+  padding: 8px 22px;
   border-radius: var(--radius-full);
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 500;
   color: var(--text-secondary);
   border: 1px solid var(--border-card);
   cursor: pointer;
   transition: var(--transition-fast);
+  background: transparent;
 }
 
 .tab.active {
   background: var(--gradient-primary);
   color: white;
   border-color: transparent;
+  box-shadow: 0 4px 16px rgba(108, 92, 231, 0.3);
 }
 
 .tab:hover:not(.active) {
   border-color: var(--border-accent);
   color: var(--text-primary);
+}
+
+/* ─── 6×2 Grid ─── */
+.depositorGrid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--space-sm);
+}
+
+/* ─── Card — compact horizontal layout ─── */
+.depositorCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  transition: var(--transition-smooth);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.depositorCard:hover {
+  border-color: var(--border-accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow-primary);
+  background: var(--bg-card-hover, var(--bg-card-elevated));
+}
+
+/* Left: flag + name/country */
+.cardLeft {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+
+.flag {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.depositorName {
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.depositorCountry {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Right: amount + date */
+.cardRight {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.depositorAmount {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent-green);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+
+.depositorDate {
+  font-size: 0.58rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+  white-space: nowrap;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 1280px) {
+  .depositorGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .depositorGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .depositorGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
