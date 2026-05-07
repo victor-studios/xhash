@@ -1,73 +1,188 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Copy, Wallet, ArrowUpFromLine, TrendingUp, Users, Trophy, CheckSquare, AlertTriangle, ListChecks, Activity, Cpu, Clock, Zap } from 'lucide-react';
+import { Copy, Wallet, ArrowUpFromLine, TrendingUp, Users, Trophy, CheckSquare, AlertTriangle, ListChecks, Activity, Cpu, Zap } from 'lucide-react';
 import { useToast } from '@/components/ui/Toast';
 import styles from './Dashboard.module.css';
+import { useAuth } from '@/lib/auth-context';
+import { supabase } from '@/lib/supabase';
 
-// Mock weekly mining data for the graph
-const weeklyData = [
-  { day: 'Mon', earned: 42, mined: 35 },
-  { day: 'Tue', earned: 58, mined: 48 },
-  { day: 'Wed', earned: 35, mined: 30 },
-  { day: 'Thu', earned: 72, mined: 60 },
-  { day: 'Fri', earned: 65, mined: 55 },
-  { day: 'Sat', earned: 80, mined: 70 },
-  { day: 'Sun', earned: 48, mined: 40 },
-];
-
-const maxVal = Math.max(...weeklyData.map(d => Math.max(d.earned, d.mined)));
+interface WeeklyData {
+  day: string;
+  earned: number;
+  mined: number;
+}
 
 export default function DashboardPage() {
   const { toast } = useToast();
+  const { user, loading: authLoading } = useAuth();
+  
+  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<any>(null);
+  const [orders, setOrders] = useState({ active: 0, expired: 0, all: 0 });
+  const [weeklyData, setWeeklyData] = useState<WeeklyData[]>([]);
+  const [maxVal, setMaxVal] = useState(100);
+
+  useEffect(() => {
+    async function fetchDashboardData() {
+      if (!user?.id) return;
+      
+      try {
+        setLoading(true);
+
+        // Fetch Profile
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+          
+        if (profileError && profileError.code !== 'PGRST116') {
+          console.error('Error fetching profile:', profileError);
+        } else if (profileData) {
+          setProfile(profileData);
+        }
+
+        // Fetch Orders Count
+        const { data: ordersData, error: ordersError } = await supabase
+          .from('orders')
+          .select('status')
+          .eq('user_id', user.id);
+          
+        if (!ordersError && ordersData) {
+          const active = ordersData.filter(o => o.status === 'active').length;
+          const expired = ordersData.filter(o => o.status === 'expired').length;
+          setOrders({ active, expired, all: ordersData.length });
+        }
+
+        // Fetch Mining History
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        const { data: historyData, error: historyError } = await supabase
+          .from('mining_history')
+          .select('*')
+          .eq('user_id', user.id)
+          .gte('date', sevenDaysAgo.toISOString().split('T')[0])
+          .order('date', { ascending: true });
+
+        if (!historyError && historyData && historyData.length > 0) {
+          const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+          const formattedData = historyData.map(d => {
+            const dateObj = new Date(d.date);
+            return {
+              day: days[dateObj.getDay()],
+              earned: Number(d.earned) || 0,
+              mined: Number(d.mined) || 0
+            };
+          });
+          setWeeklyData(formattedData);
+          
+          const max = Math.max(...formattedData.map(d => Math.max(d.earned, d.mined)));
+          setMaxVal(max > 0 ? max : 100);
+        } else {
+          // Default mock layout for empty state
+          const defaultData = [
+            { day: 'Mon', earned: 0, mined: 0 },
+            { day: 'Tue', earned: 0, mined: 0 },
+            { day: 'Wed', earned: 0, mined: 0 },
+            { day: 'Thu', earned: 0, mined: 0 },
+            { day: 'Fri', earned: 0, mined: 0 },
+            { day: 'Sat', earned: 0, mined: 0 },
+            { day: 'Sun', earned: 0, mined: 0 },
+          ];
+          setWeeklyData(defaultData);
+          setMaxVal(100);
+        }
+
+      } catch (err) {
+        console.error('Failed to fetch dashboard data', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    if (!authLoading) {
+      fetchDashboardData();
+    }
+  }, [user?.id, authLoading]);
 
   const handleCopy = () => {
-    navigator.clipboard.writeText('https://xhash.io/r/kr950MG425');
+    const affiliateUrl = `https://xhashgpu.com/r/${profile?.affiliate_code || 'default'}`;
+    navigator.clipboard.writeText(affiliateUrl);
     toast({ variant: 'success', title: 'Copied!', message: 'Affiliate link copied to clipboard.' });
   };
 
+  if (authLoading || loading) {
+    return <div className="p-8 text-center" style={{ color: 'var(--text-secondary)' }}>Loading dashboard data...</div>;
+  }
+
+  // Default fallbacks if profile not found
+  const availableBalance = profile?.available_balance || 0;
+  const totalDeposit = profile?.total_deposit || 0;
+  const totalEarned = profile?.total_earned || 0;
+  const totalWithdrawn = profile?.total_withdrawn || 0;
+  const hashRate = profile?.hash_rate || 0;
+  const activeMiners = profile?.active_miners || 0;
+  const dailyReturn = profile?.daily_return || 0;
+  const affiliateEarned = profile?.affiliate_earned || 0;
+  const rewardsEarned = profile?.rewards_earned || 0;
+
   return (
     <>
-      {/* Affiliate Link */}
-
       {/* Balance Cards */}
-      <div className={styles.balanceRow}>
-        <div className={styles.balanceCard}>
-          <div className={styles.balanceIcon} style={{ background: 'linear-gradient(135deg, #FFD700, #FF8C00)' }}>
-            <Wallet size={28} color="#070A14" />
+      {/* Balance & Stats Row */}
+      <div className={styles.topDashboardSection}>
+        {/* Main Available Balance Card */}
+        <div className={styles.mainBalanceCard}>
+          <div className={styles.mainBalanceHeader}>
+            <div className={styles.balanceIconWrapper}>
+              <Wallet size={32} color="var(--accent-primary)" />
+            </div>
+            <div>
+              <span className={styles.mainBalanceLabel}>Available Balance</span>
+              <div className={styles.mainBalanceValue}>$ {availableBalance.toFixed(2)}</div>
+            </div>
           </div>
-          <div className={styles.balancePair}>
-            <div className={styles.balanceItem}>
-              <span className={styles.balanceLabel}>Available Balance</span>
-              <span className={styles.balanceValue} style={{ color: 'var(--accent-green)' }}>$ 340</span>
-            </div>
-            <div className={styles.balanceItem}>
-              <span className={styles.balanceLabel}>Total Deposit</span>
-              <span className={styles.balanceValue}>$400</span>
-              <Link href="/dashboard/deposit" className={styles.actionBtn}>
-                <Wallet size={14} />
-                Deposit
-              </Link>
-            </div>
+          <div className={styles.mainBalanceActions}>
+            <Link href="/dashboard/deposit" className={styles.mainActionBtn}>
+              <Wallet size={16} /> Deposit
+            </Link>
+            <Link href="/dashboard/withdraw" className={`${styles.mainActionBtn} ${styles.btnOutline}`}>
+              <ArrowUpFromLine size={16} /> Withdraw
+            </Link>
           </div>
         </div>
 
-        <div className={styles.balanceCard}>
-          <div className={styles.balanceIcon} style={{ background: 'linear-gradient(135deg, #FF6B6B, #ee5a24)' }}>
-            <TrendingUp size={28} color="#fff" />
-          </div>
-          <div className={styles.balancePair}>
-            <div className={styles.balanceItem}>
-              <span className={styles.balanceLabel}>total Earned</span>
-              <span className={styles.balanceValue} style={{ color: 'var(--accent-green)' }}>$ 340</span>
+        {/* Secondary Stats Cards */}
+        <div className={styles.secondaryStatsGrid}>
+          <div className={styles.secondaryStatCard}>
+            <div className={styles.statIconSmall} style={{ color: 'var(--accent-green)', background: 'rgba(0, 230, 118, 0.1)' }}>
+              <TrendingUp size={20} />
             </div>
-            <div className={styles.balanceItem}>
-              <span className={styles.balanceLabel}>Total Withdrawn</span>
-              <span className={styles.balanceValue}>$400</span>
-              <Link href="/dashboard/withdraw" className={styles.actionBtn}>
-                <ArrowUpFromLine size={14} />
-                Withdraw
-              </Link>
+            <div className={styles.statContent}>
+              <span className={styles.statLabel}>Total Earned</span>
+              <span className={styles.statValue}>$ {totalEarned.toFixed(2)}</span>
+            </div>
+          </div>
+          
+          <div className={styles.secondaryStatCard}>
+            <div className={styles.statIconSmall} style={{ color: 'var(--accent-gold)', background: 'rgba(255, 215, 0, 0.1)' }}>
+              <Wallet size={20} />
+            </div>
+            <div className={styles.statContent}>
+              <span className={styles.statLabel}>Total Deposit</span>
+              <span className={styles.statValue}>$ {totalDeposit.toFixed(2)}</span>
+            </div>
+          </div>
+
+          <div className={styles.secondaryStatCard}>
+            <div className={styles.statIconSmall} style={{ color: 'var(--accent-secondary)', background: 'rgba(0, 210, 255, 0.1)' }}>
+              <ArrowUpFromLine size={20} />
+            </div>
+            <div className={styles.statContent}>
+              <span className={styles.statLabel}>Total Withdrawn</span>
+              <span className={styles.statValue}>$ {totalWithdrawn.toFixed(2)}</span>
             </div>
           </div>
         </div>
@@ -101,8 +216,8 @@ export default function DashboardPage() {
 
           {/* Bars */}
           <div className={styles.bars}>
-            {weeklyData.map((d) => (
-              <div key={d.day} className={styles.barGroup}>
+            {weeklyData.map((d, index) => (
+              <div key={index} className={styles.barGroup}>
                 <div className={styles.barPair}>
                   <div
                     className={styles.bar}
@@ -136,7 +251,7 @@ export default function DashboardPage() {
           </div>
           <div>
             <span className={styles.quickStatLabel}>Hash Rate</span>
-            <span className={styles.quickStatValue}>245.8 MH/s</span>
+            <span className={styles.quickStatValue}>{hashRate} MH/s</span>
           </div>
         </div>
         <div className={styles.quickStatCard}>
@@ -145,7 +260,7 @@ export default function DashboardPage() {
           </div>
           <div>
             <span className={styles.quickStatLabel}>Active Miners</span>
-            <span className={styles.quickStatValue}>3</span>
+            <span className={styles.quickStatValue}>{activeMiners}</span>
           </div>
         </div>
         <div className={styles.quickStatCard}>
@@ -154,7 +269,7 @@ export default function DashboardPage() {
           </div>
           <div>
             <span className={styles.quickStatLabel}>Daily Return</span>
-            <span className={styles.quickStatValue}>$12.50</span>
+            <span className={styles.quickStatValue}>${dailyReturn.toFixed(2)}</span>
           </div>
         </div>
       </div>
@@ -164,7 +279,7 @@ export default function DashboardPage() {
         <div className="stat-card">
           <div className="stat-info">
             <h4>Profits</h4>
-            <span className="stat-value" style={{ color: 'var(--accent-green)' }}>$ 340</span>
+            <span className="stat-value" style={{ color: 'var(--accent-green)' }}>$ {totalEarned.toFixed(2)}</span>
           </div>
           <div className="stat-icon" style={{ background: 'rgba(0, 230, 118, 0.12)', color: 'var(--accent-green)' }}>
             <TrendingUp size={24} />
@@ -173,7 +288,7 @@ export default function DashboardPage() {
         <div className="stat-card">
           <div className="stat-info">
             <h4>Affiliates</h4>
-            <span className="stat-value" style={{ color: 'var(--accent-green)' }}>$ 340</span>
+            <span className="stat-value" style={{ color: 'var(--accent-green)' }}>$ {affiliateEarned.toFixed(2)}</span>
           </div>
           <div className="stat-icon" style={{ background: 'rgba(0, 210, 255, 0.12)', color: 'var(--accent-secondary)' }}>
             <Users size={24} />
@@ -182,7 +297,7 @@ export default function DashboardPage() {
         <div className="stat-card">
           <div className="stat-info">
             <h4>Rewards</h4>
-            <span className="stat-value" style={{ color: 'var(--accent-green)' }}>$ 340</span>
+            <span className="stat-value" style={{ color: 'var(--accent-green)' }}>$ {rewardsEarned.toFixed(2)}</span>
           </div>
           <div className="stat-icon" style={{ background: 'rgba(255, 215, 0, 0.12)', color: 'var(--accent-gold)' }}>
             <Trophy size={24} />
@@ -196,7 +311,7 @@ export default function DashboardPage() {
         <div className="stat-card">
           <div className="stat-info">
             <h4>Active</h4>
-            <span className="stat-value" style={{ color: 'var(--accent-green)' }}>2</span>
+            <span className="stat-value" style={{ color: 'var(--accent-green)' }}>{orders.active}</span>
           </div>
           <div className="stat-icon" style={{ background: 'rgba(0, 230, 118, 0.12)', color: 'var(--accent-green)' }}>
             <CheckSquare size={24} />
@@ -205,7 +320,7 @@ export default function DashboardPage() {
         <div className="stat-card">
           <div className="stat-info">
             <h4>Expired</h4>
-            <span className="stat-value" style={{ color: 'var(--accent-gold)' }}>5</span>
+            <span className="stat-value" style={{ color: 'var(--accent-gold)' }}>{orders.expired}</span>
           </div>
           <div className="stat-icon" style={{ background: 'rgba(255, 215, 0, 0.12)', color: 'var(--accent-gold)' }}>
             <AlertTriangle size={24} />
@@ -214,7 +329,7 @@ export default function DashboardPage() {
         <div className="stat-card">
           <div className="stat-info">
             <h4>All</h4>
-            <span className="stat-value" style={{ color: 'var(--accent-secondary)' }}>7</span>
+            <span className="stat-value" style={{ color: 'var(--accent-secondary)' }}>{orders.all}</span>
           </div>
           <div className="stat-icon" style={{ background: 'rgba(0, 210, 255, 0.12)', color: 'var(--accent-secondary)' }}>
             <ListChecks size={24} />
@@ -225,7 +340,9 @@ export default function DashboardPage() {
       {/* Affiliate Link */}
       <div className="affiliate-bar">
         <div className="affiliate-bar-label">Affiliate Link :</div>
-        <div className="affiliate-bar-url">https://xhash.io/r/kr950MG425</div>
+        <div className="affiliate-bar-url">
+          https://xhashgpu.com/r/{profile?.affiliate_code || 'default'}
+        </div>
         <button className="affiliate-bar-copy" onClick={handleCopy} aria-label="Copy affiliate link" id="copy-affiliate-link">
           <Copy size={18} />
         </button>
@@ -233,3 +350,4 @@ export default function DashboardPage() {
     </>
   );
 }
+

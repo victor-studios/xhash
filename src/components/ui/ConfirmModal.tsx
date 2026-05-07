@@ -9,7 +9,7 @@ export type ConfirmVariant = 'purchase' | 'withdraw' | 'danger' | 'info' | 'succ
 
 export interface ConfirmDetail {
   label: string;
-  value: string;
+  value: React.ReactNode;
   accent?: boolean;
 }
 

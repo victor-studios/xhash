@@ -82,18 +82,19 @@
   padding: 11px 16px;
   border-radius: var(--radius-md);
   font-size: 0.85rem;
-  font-weight: 600;
-  color: white;
-  background: var(--gradient-primary);
-  border: none;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
   cursor: pointer;
   transition: var(--transition-smooth);
   text-decoration: none;
 }
 
 .explorePlans:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-glow-primary);
+  color: var(--text-primary);
+  border-color: rgba(108, 92, 231, 0.4);
+  background: rgba(108, 92, 231, 0.08);
 }
 
 .logoutBtn {

@@ -1,83 +1,61 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { ChevronDown, Copy, Clock, CheckCircle2, XCircle, Upload } from 'lucide-react';
-import DepositModal from '@/components/Dashboard/DepositModal';
-import UploadProofModal from '@/components/Dashboard/UploadProofModal';
+import Script from 'next/script';
+import { Copy, Clock, CheckCircle2, XCircle, Upload, Loader2 } from 'lucide-react';
 import StatusModal from '@/components/Dashboard/StatusModal';
 import { useToast } from '@/components/ui/Toast';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/lib/auth-context';
+import { timeAgo } from '@/lib/utils';
 import styles from './Deposit.module.css';
 
-/* ─── Crypto Options ─── */
-interface CryptoOption {
-  id: string;
-  name: string;
-  chain: string;
-  symbol: string;
-  icon: string;
-  color: string;
-  address: string;
-}
-
-const cryptoOptions: CryptoOption[] = [
-  { id: 'usdt-trc20', name: 'USDT', chain: 'TRC-20 (Tron)', symbol: 'USDT', icon: '₮', color: '#26A17B', address: 'TXqHhR3vKx3sYUgwNPx5WMj6Hf1YkGNg8Z' },
-  { id: 'usdt-bsc', name: 'USDT', chain: 'BEP-20 (BSC)', symbol: 'USDT', icon: '₮', color: '#26A17B', address: '0x8B2Fe44c1a62d5C2eF8bC1a2E3b4D5c6F7890123' },
-  { id: 'usdt-sol', name: 'USDT', chain: 'SPL (Solana)', symbol: 'USDT', icon: '₮', color: '#26A17B', address: '7dHbWXmci3dT8UFYWYZweBLXgycu7Y3iL6trKn1Y7ARj' },
-  { id: 'sol', name: 'Solana', chain: 'Solana', symbol: 'SOL', icon: '◎', color: '#9945FF', address: '5kGzRqCNjfVLP4k9dfq4bUzDrgY2rqTnGX3KY6vRcbiN' },
-  { id: 'eth', name: 'Ethereum', chain: 'ERC-20', symbol: 'ETH', icon: '⟠', color: '#627EEA', address: '0x742d35Cc6634C0532925a3b844Bc9e7595f2bD3e' },
-  { id: 'btc', name: 'Bitcoin', chain: 'Bitcoin', symbol: 'BTC', icon: '₿', color: '#F7931A', address: '3HCXsjABKQe7mTNmI2HAwc1RRatMvU6Htqa' },
-  { id: 'ltc', name: 'Litecoin', chain: 'Litecoin', symbol: 'LTC', icon: 'Ł', color: '#BFBBBB', address: 'ltc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4' },
-  { id: 'xrp', name: 'XRP', chain: 'XRPL', symbol: 'XRP', icon: '✕', color: '#23292F', address: 'rN7hFD5jUyMLBjL3EJQEkpsTedQ2HQBEkq' },
-  { id: 'ada', name: 'Cardano', chain: 'Cardano', symbol: 'ADA', icon: '₳', color: '#0033AD', address: 'addr1qxyz789abc456def012ghi345jkl678mno901pqr' },
-];
-
-const depositHistory = [
-  { status: 'Completed', time: '3 mins Ago', amount: '$535', crypto: 'BTC', action: 'view' as const },
-  { status: 'Completed', time: '12 mins Ago', amount: '$1,200', crypto: 'ETH', action: 'view' as const },
-  { status: 'Failed', time: '1 hr Ago', amount: '$250', crypto: 'USDT', action: 'view' as const },
-  { status: 'Waiting for payment', time: '2 hrs Ago', amount: '$535', crypto: 'BTC', action: 'upload' as const },
-  { status: 'Completed', time: '3 hrs Ago', amount: '$800', crypto: 'SOL', action: 'view' as const },
-  { status: 'Completed', time: '5 hrs Ago', amount: '$3,500', crypto: 'BTC', action: 'view' as const },
-  { status: 'Failed', time: '8 hrs Ago', amount: '$150', crypto: 'LTC', action: 'view' as const },
-  { status: 'Completed', time: '12 hrs Ago', amount: '$2,000', crypto: 'ETH', action: 'view' as const },
-  { status: 'Waiting for payment', time: '1 day Ago', amount: '$420', crypto: 'USDT', action: 'upload' as const },
-  { status: 'Completed', time: '1 day Ago', amount: '$1,750', crypto: 'BTC', action: 'view' as const },
-  { status: 'Completed', time: '2 days Ago', amount: '$600', crypto: 'SOL', action: 'view' as const },
-  { status: 'Failed', time: '2 days Ago', amount: '$90', crypto: 'XRP', action: 'view' as const },
-  { status: 'Completed', time: '3 days Ago', amount: '$4,200', crypto: 'BTC', action: 'view' as const },
-  { status: 'Completed', time: '3 days Ago', amount: '$310', crypto: 'ADA', action: 'view' as const },
-  { status: 'Completed', time: '4 days Ago', amount: '$1,100', crypto: 'ETH', action: 'view' as const },
-  { status: 'Failed', time: '5 days Ago', amount: '$200', crypto: 'LTC', action: 'view' as const },
-  { status: 'Completed', time: '5 days Ago', amount: '$950', crypto: 'USDT', action: 'view' as const },
-  { status: 'Completed', time: '6 days Ago', amount: '$2,800', crypto: 'BTC', action: 'view' as const },
-  { status: 'Completed', time: '1 week Ago', amount: '$500', crypto: 'SOL', action: 'view' as const },
-  { status: 'Completed', time: '1 week Ago', amount: '$1,350', crypto: 'ETH', action: 'view' as const },
-];
-
 export default function DepositPage() {
+  const { user, loading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState<'balance' | 'direct'>('balance');
-  const [selectedCrypto, setSelectedCrypto] = useState<CryptoOption>(cryptoOptions[0]);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [amount, setAmount] = useState('');
-  const [showDepositModal, setShowDepositModal] = useState(false);
-  const [showUploadModal, setShowUploadModal] = useState(false);
+  
   const [statusModal, setStatusModal] = useState<{
     type: 'success' | 'failed';
     data: { time: string; status: string; paymentSystem: string; amount: string; remarks: string };
   } | null>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  
   const { toast } = useToast();
 
-  // Close dropdown on outside click
+  const [loading, setLoading] = useState(true);
+  const [availableBalance, setAvailableBalance] = useState(0);
+  const [depositHistory, setDepositHistory] = useState<any[]>([]);
+
   useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setDropdownOpen(false);
+    async function fetchData() {
+      if (!user?.id) return;
+      try {
+        setLoading(true);
+        // Fetch balance
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('available_balance')
+          .eq('id', user.id)
+          .single();
+        if (profile) setAvailableBalance(profile.available_balance || 0);
+
+        // Fetch deposits
+        const { data: txs } = await supabase
+          .from('transactions')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('type', 'deposit')
+          .order('created_at', { ascending: false });
+        
+        if (txs) setDepositHistory(txs);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
       }
     }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    if (!authLoading) fetchData();
+  }, [user?.id, authLoading]);
 
   const getStatusColor = (status: string) => {
     if (status === 'Completed') return 'var(--accent-green)';
@@ -91,17 +69,20 @@ export default function DepositPage() {
     return <Clock size={14} />;
   };
 
-  const handleRowAction = (row: typeof depositHistory[0]) => {
-    if (row.action === 'upload') {
-      setShowUploadModal(true);
+
+
+  const handleRowAction = (row: any) => {
+    if (row.status === 'Waiting for payment') {
+      // Do nothing or handle bank transfer upload proof logic if needed in the future
+      toast({ variant: 'info', title: 'Processing', message: 'Bank transfer is being processed.' });
     } else {
       setStatusModal({
         type: row.status === 'Failed' ? 'failed' : 'success',
         data: {
-          time: 'Apr 20, 2023 12:32:38 PM',
-          status: row.status === 'Failed' ? 'Failed' : 'Successful',
-          paymentSystem: row.crypto,
-          amount: `${row.amount} = 0.02445 ${row.crypto}`,
+          time: new Date(row.created_at).toLocaleString(),
+          status: row.status,
+          paymentSystem: row.currency,
+          amount: `$${row.amount}`,
           remarks: row.status === 'Failed' ? 'The deposit failed' : 'Amount deposited successfully',
         },
       });
@@ -113,8 +94,42 @@ export default function DepositPage() {
     toast({ variant: 'success', title: 'Copied!', message: 'Address copied to clipboard.' });
   };
 
+  const handleBankDeposit = async () => {
+    if (!amount || parseFloat(amount) < 500) {
+      toast({ variant: 'error', title: 'Invalid Amount', message: 'Minimum bank deposit is $500.' });
+      return;
+    }
+    
+    if (!user?.id) return;
+    
+    const { error } = await supabase.from('transactions').insert({
+      user_id: user.id,
+      type: 'deposit',
+      amount: parseFloat(amount),
+      currency: 'USD (Bank)',
+      status: 'Waiting for payment',
+      description: 'Direct Bank Transfer'
+    });
+
+    if (!error) {
+      toast({ variant: 'info', title: 'Deposit Initiated', message: 'Please complete the bank transfer. Your account will be credited once confirmed.' });
+      setAmount('');
+      // Optimistically fetch again to update list
+      const { data: txs } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('type', 'deposit')
+        .order('created_at', { ascending: false });
+      if (txs) setDepositHistory(txs);
+    } else {
+      toast({ variant: 'error', title: 'Error', message: 'Failed to initiate deposit.' });
+    }
+  };
+
   return (
     <>
+      <Script src="https://atlos.io/packages/app/atlos.js" strategy="lazyOnload" />
       <div className={styles.splitLayout}>
         {/* ─── Left: Deposit Form ─── */}
         <div className={styles.formSection}>
@@ -138,60 +153,24 @@ export default function DepositPage() {
             <div className="dash-tab-content">
               {activeTab === 'balance' && (
                 <>
-                  <div className="dash-input-group">
-                    <div className={styles.cryptoDropdown} ref={dropdownRef}>
-                      <button
-                        type="button"
-                        className={`${styles.dropdownTrigger} ${dropdownOpen ? styles.open : ''}`}
-                        onClick={() => setDropdownOpen(!dropdownOpen)}
-                        id="deposit-payment-method"
-                      >
-                        <span
-                          className={styles.cryptoIconBadge}
-                          style={{ backgroundColor: selectedCrypto.color }}
-                        >
-                          {selectedCrypto.icon}
-                        </span>
-                        <span className={styles.cryptoName}>
-                          {selectedCrypto.name}
-                          <span className={styles.cryptoChain}>[{selectedCrypto.chain}]</span>
-                        </span>
-                        <ChevronDown
-                          size={16}
-                          className={`${styles.dropdownArrow} ${dropdownOpen ? styles.rotated : ''}`}
-                        />
-                      </button>
-
-                      {dropdownOpen && (
-                        <div className={styles.dropdownMenu}>
-                          {cryptoOptions.map((option) => (
-                            <button
-                              key={option.id}
-                              type="button"
-                              className={`${styles.dropdownItem} ${selectedCrypto.id === option.id ? styles.selected : ''}`}
-                              onClick={() => {
-                                setSelectedCrypto(option);
-                                setDropdownOpen(false);
-                              }}
-                            >
-                              <span
-                                className={`${styles.cryptoIconBadge} ${styles.cryptoIconSmall}`}
-                                style={{ backgroundColor: option.color }}
-                              >
-                                {option.icon}
-                              </span>
-                              <span className={styles.cryptoName}>
-                                {option.name}
-                                <span className={styles.cryptoChain}>[{option.chain}]</span>
-                              </span>
-                            </button>
-                          ))}
-                        </div>
-                      )}
+                  <div style={{ textAlign: 'center', marginBottom: '1.5rem', background: 'var(--bg-card)', padding: '16px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-default)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '12px' }}>
+                      <span className={styles.cryptoIconBadge} style={{ backgroundColor: '#F7931A', width: '32px', height: '32px', fontSize: '1.1rem' }}>₿</span>
+                      <span className={styles.cryptoIconBadge} style={{ backgroundColor: '#26A17B', width: '32px', height: '32px', fontSize: '1.1rem' }}>₮</span>
+                      <span className={styles.cryptoIconBadge} style={{ backgroundColor: '#2775CA', width: '32px', height: '32px', fontSize: '1.1rem', fontWeight: 'bold' }}>$</span>
+                      <span className={styles.cryptoIconBadge} style={{ backgroundColor: '#627EEA', width: '32px', height: '32px', fontSize: '1.1rem' }}>⟠</span>
+                      <span className={styles.cryptoIconBadge} style={{ backgroundColor: '#9945FF', width: '32px', height: '32px', fontSize: '1.1rem' }}>◎</span>
+                      <span className={styles.cryptoIconBadge} style={{ backgroundColor: '#F3BA2F', width: '32px', height: '32px', fontSize: '1.1rem', color: '#000', fontWeight: 'bold' }}>B</span>
                     </div>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: 0 }}>
+                      You can deposit quick and safely within minutes with crypto deposit
+                    </p>
+                  </div>
+
+                  <div className="dash-input-group">
 
                     <input
-                      type="text"
+                      type="number"
                       className="dash-input"
                       placeholder="Enter Amount in $"
                       value={amount}
@@ -207,10 +186,25 @@ export default function DepositPage() {
 
                   <button
                     className="dash-btn-primary"
-                    onClick={() => setShowDepositModal(true)}
+                    onClick={() => {
+                      if (!amount || parseFloat(amount) < 100) {
+                        toast({ variant: 'error', title: 'Invalid Amount', message: 'Minimum deposit is $100.' });
+                        return;
+                      }
+                      
+                      if (typeof (window as any).atlos !== 'undefined') {
+                        (window as any).atlos.Pay({
+                          merchantId: '7VTAJWP38H',
+                          orderId: user?.id || `GUEST_${Date.now()}`,
+                          orderAmount: parseFloat(amount)
+                        });
+                      } else {
+                        toast({ variant: 'error', title: 'Error', message: 'Payment gateway is still loading. Please try again in a moment.' });
+                      }
+                    }}
                     id="deposit-submit-btn"
                   >
-                    Deposit
+                    Proceed to Payment
                   </button>
                 </>
               )}
@@ -257,8 +251,8 @@ export default function DepositPage() {
                     <div className={styles.bankRow}>
                       <span className={styles.bankLabel}>Reference</span>
                       <span className={styles.bankValue}>
-                        XH-DEP-kr950MG425
-                        <button className={styles.bankCopyBtn} onClick={() => handleCopy('XH-DEP-kr950MG425')} aria-label="Copy">
+                        XH-DEP-{user?.id?.substring(0, 8) || '00000000'}
+                        <button className={styles.bankCopyBtn} onClick={() => handleCopy(`XH-DEP-${user?.id?.substring(0, 8) || '00000000'}`)} aria-label="Copy">
                           <Copy size={12} />
                         </button>
                       </span>
@@ -271,7 +265,7 @@ export default function DepositPage() {
 
                   <div className="dash-input-group" style={{ marginTop: 'var(--space-lg)' }}>
                     <input
-                      type="text"
+                      type="number"
                       className="dash-input"
                       placeholder="Enter Amount in $"
                       value={amount}
@@ -286,13 +280,7 @@ export default function DepositPage() {
 
                   <button
                     className="dash-btn-primary"
-                    onClick={() => {
-                      if (!amount || parseFloat(amount) < 500) {
-                        toast({ variant: 'error', title: 'Invalid Amount', message: 'Minimum bank deposit is $500.' });
-                        return;
-                      }
-                      toast({ variant: 'info', title: 'Deposit Initiated', message: 'Please complete the bank transfer using the details above. Your account will be credited once confirmed.' });
-                    }}
+                    onClick={handleBankDeposit}
                     id="bank-deposit-submit-btn"
                   >
                     Confirm Bank Deposit
@@ -305,7 +293,7 @@ export default function DepositPage() {
           {/* Balance card stretches to fill remaining space */}
           <div className={styles.balanceCardStretch}>
             <h3>Available Balance</h3>
-            <span className={styles.balanceAmount}>$ 340</span>
+            <span className={styles.balanceAmount}>$ {availableBalance.toFixed(2)}</span>
           </div>
         </div>
 
@@ -316,51 +304,44 @@ export default function DepositPage() {
             <span className={styles.historyCount}>{depositHistory.length} records</span>
           </div>
           <div className={styles.historyList}>
-            {depositHistory.map((row, i) => (
-              <div key={i} className={styles.historyItem} onClick={() => handleRowAction(row)}>
-                <div className={styles.historyItemLeft}>
-                  <div className={styles.historyStatusIcon} style={{ color: getStatusColor(row.status) }}>
-                    {getStatusIcon(row.status)}
-                  </div>
-                  <div className={styles.historyItemInfo}>
-                    <span className={styles.historyStatus} style={{ color: getStatusColor(row.status) }}>
-                      {row.status}
-                    </span>
-                    <span className={styles.historyTime}>{row.time}</span>
-                  </div>
-                </div>
-                <div className={styles.historyItemRight}>
-                  <span className={styles.historyAmount}>{row.amount}</span>
-                  <span className={styles.historyCrypto}>{row.crypto}</span>
-                  {row.action === 'upload' && (
-                    <span className={styles.uploadBadge}>
-                      <Upload size={10} />
-                    </span>
-                  )}
-                </div>
+            {loading ? (
+              <div className="p-4 text-center" style={{ color: 'var(--text-secondary)' }}>
+                <Loader2 size={24} className="animate-spin mx-auto mb-2" />
+                Loading history...
               </div>
-            ))}
+            ) : depositHistory.length === 0 ? (
+              <div className="p-4 text-center" style={{ color: 'var(--text-secondary)' }}>
+                No deposit history found.
+              </div>
+            ) : (
+              depositHistory.map((row) => (
+                <div key={row.id} className={styles.historyItem} onClick={() => handleRowAction(row)}>
+                  <div className={styles.historyItemLeft}>
+                    <div className={styles.historyStatusIcon} style={{ color: getStatusColor(row.status) }}>
+                      {getStatusIcon(row.status)}
+                    </div>
+                    <div className={styles.historyItemInfo}>
+                      <span className={styles.historyStatus} style={{ color: getStatusColor(row.status) }}>
+                        {row.status}
+                      </span>
+                      <span className={styles.historyTime}>{timeAgo(row.created_at)}</span>
+                    </div>
+                  </div>
+                  <div className={styles.historyItemRight}>
+                    <span className={styles.historyAmount}>${row.amount}</span>
+                    <span className={styles.historyCrypto}>{row.currency}</span>
+                    {row.status === 'Waiting for payment' && (
+                      <span className={styles.uploadBadge}>
+                        <Upload size={10} />
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
-
-      {/* Deposit BTC Modal */}
-      {showDepositModal && (
-        <DepositModal
-          onClose={() => setShowDepositModal(false)}
-          amount={`${amount || '0.00'} ${selectedCrypto.symbol}`}
-          address={selectedCrypto.address}
-        />
-      )}
-
-      {/* Upload Proof Modal */}
-      {showUploadModal && (
-        <UploadProofModal
-          orderNumber="ORD-2026050512345"
-          depositDate="May 5, 2026 12:32 PM"
-          onClose={() => setShowUploadModal(false)}
-        />
-      )}
 
       {/* Status Modal */}
       {statusModal && (

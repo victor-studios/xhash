@@ -4,23 +4,16 @@ export interface MiningPackage {
   name: string;
   subtitle?: string;
   crypto: string;
-  cryptoIcon: string;
-  cryptoColor: string;
-  capacityCurrent: number;
-  capacityTotal: number;
-  duration: string;
-  dailyMining: string;
-  hardwareCost: string;
-  totalReturn: string;
-  totalPrice: string;
-  contractProfit: string;
-  fixedReturn: string;
-  returnType: string;
-  dailyRate: string;
-  referralReward: string;
-  isSoldOut: boolean;
+  crypto_icon: string;
+  crypto_color: string;
+  duration_months: number;
+  price: number;
+  total_return: number;
+  slots_total: number;
+  slots_available: number;
+  is_sold_out: boolean;
+  created_at?: string;
 }
-
 export interface Depositor {
   id: string;
   name: string;

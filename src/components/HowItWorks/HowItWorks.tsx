@@ -8,6 +8,7 @@ export default function HowItWorks() {
     <section className={styles.howItWorks} id="how-it-works-section">
       <div className="container">
         <div className="section-header">
+          <p className="section-tag">// How It Works</p>
           <h2 className="section-title">
             Start making a profit with mining <span className="gradient-text">right now!</span>
           </h2>

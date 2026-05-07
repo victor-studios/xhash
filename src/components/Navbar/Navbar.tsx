@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { navLinks } from '@/data/content';
-import { User, LayoutDashboard } from 'lucide-react';
+import { User, LayoutDashboard, Wallet } from 'lucide-react';
 import XHashLogo from '@/components/XHashLogo/XHashLogo';
 import styles from './Navbar.module.css';
 
@@ -54,15 +54,21 @@ export default function Navbar() {
         <div className={styles.navRight}>
 
           {isLoggedIn ? (
-            <Link href="/dashboard" className={styles.userMenu} id="nav-dashboard-link">
-              <span className={styles.dashboardLabel}>
-                <LayoutDashboard size={16} />
-                Dashboard
-              </span>
-              <div className={styles.userAvatar}>
-                {user?.name ? user.name[0].toUpperCase() : <User size={16} />}
-              </div>
-            </Link>
+            <>
+              <Link href="/dashboard/deposit" className={styles.walletButton}>
+                <Wallet size={16} />
+                <span>${user?.balance?.toFixed(2) || '0.00'}</span>
+              </Link>
+              <Link href="/dashboard" className={styles.userMenu} id="nav-dashboard-link">
+                <span className={styles.dashboardLabel}>
+                  <LayoutDashboard size={16} />
+                  Dashboard
+                </span>
+                <div className={styles.userAvatar}>
+                  {user?.name ? user.name[0].toUpperCase() : <User size={16} />}
+                </div>
+              </Link>
+            </>
           ) : (
             <>
               <Link href="/login" className={styles.btnLogin}>

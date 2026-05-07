@@ -8,6 +8,7 @@ export default function LatestTalks() {
     <section className={styles.latestTalks} id="latest-talks-section">
       <div className="container">
         <div className="section-header">
+          <p className="section-tag">// Our Blog</p>
           <h2 className="section-title">Latest <span className="gradient-text">Talks</span></h2>
         </div>
 

@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import ProcessSection from '@/components/ProcessSection/ProcessSection';
 import styles from './page.module.css';
 
 /* ═══════════════ SVG ICON LIBRARY ═══════════════ */
@@ -145,10 +146,10 @@ export default function AboutPage() {
   ];
 
   const team = [
-    { initials: 'AK', name: 'Alex Kovacs',  role: 'CEO & Co-Founder', bio: 'Ex-Google DeepMind. 12 years distributed systems. Three blockchain exits.' },
-    { initials: 'SR', name: 'Sara Reyes',   role: 'CTO',               bio: 'CUDA kernel engineer. Former Nvidia GPU Architecture team. 4 compute patents.' },
-    { initials: 'JL', name: 'James Liu',    role: 'Head of Security',  bio: 'Cryptographer. Previously led security at Binance. PhD CS, MIT.' },
-    { initials: 'MN', name: 'Maya Nkosi',   role: 'Head of Growth',    bio: 'Scaled three DeFi protocols past $1B TVL. Speaker, DevCon 2023.' },
+    { img: '/images/team/alex.png', name: 'Alex Kovacs',  role: 'CEO & Co-Founder', bio: 'Ex-Google DeepMind. 12 years distributed systems. Three blockchain exits.' },
+    { img: '/images/team/sara.png', name: 'Sara Reyes',   role: 'CTO',               bio: 'CUDA kernel engineer. Former Nvidia GPU Architecture team. 4 compute patents.' },
+    { img: '/images/team/james.png', name: 'James Liu',    role: 'Head of Security',  bio: 'Cryptographer. Previously led security at Binance. PhD CS, MIT.' },
+    { img: '/images/team/maya.png', name: 'Maya Nkosi',   role: 'Head of Growth',    bio: 'Scaled three DeFi protocols past $1B TVL. Speaker, DevCon 2023.' },
   ];
 
   return (
@@ -225,7 +226,7 @@ export default function AboutPage() {
         <div className={styles.container}>
           <div className={styles.missionGrid}>
             <div className={styles.missionText}>
-              <p className={styles.eyebrow}>// Our Mission</p>
+              <p className="section-tag">// Our Mission</p>
               <h2 className={styles.sectionTitle}>
                 Democratising Access to{' '}
                 <span className={styles.gradientText}>Industrial Mining</span>
@@ -259,11 +260,13 @@ export default function AboutPage() {
 
       <div className={styles.divider} />
 
+      <ProcessSection />
+
       {/* ══════════ VALUES ══════════ */}
       <section className={styles.section}>
         <div className={styles.container}>
           <div className={styles.centeredHeader}>
-            <p className={styles.sectionTag}>// Core Values</p>
+            <p className="section-tag">// Core Values</p>
             <h2 className={styles.sectionTitle}>What Drives Us</h2>
             <p className={styles.sectionSub}>
               Every decision we make is grounded in these principles — from infrastructure
@@ -289,7 +292,7 @@ export default function AboutPage() {
       <section className={styles.section}>
         <div className={styles.container}>
           <div className={styles.centeredHeader}>
-            <p className={styles.sectionTag}>// The People</p>
+            <p className="section-tag">// The People</p>
             <h2 className={styles.sectionTitle}>Meet the Team</h2>
             <p className={styles.sectionSub}>
               A tight-knit group of engineers, cryptographers, and finance veterans united
@@ -298,9 +301,11 @@ export default function AboutPage() {
           </div>
 
           <div className={styles.teamGrid}>
-            {team.map(({ initials, name, role, bio }, i) => (
+            {team.map(({ img, name, role, bio }, i) => (
               <div key={name} className={styles.teamCard} style={{ animationDelay: `${i * 90}ms` }}>
-                <div className={styles.teamAvatar}>{initials}</div>
+                <div className={styles.teamAvatar}>
+                  <img src={img} alt={name} className={styles.teamAvatarImg} />
+                </div>
                 <h4 className={styles.teamName}>{name}</h4>
                 <p  className={styles.teamRole}>{role}</p>
                 <p  className={styles.teamBio}>{bio}</p>
@@ -317,14 +322,22 @@ export default function AboutPage() {
         <div className={styles.container}>
           <div className={styles.ctaBand}>
             <div className={styles.ctaTopLine} aria-hidden="true" />
-            <h2 className={styles.ctaTitle}>Ready to Start Mining?</h2>
-            <p className={styles.ctaBody}>
-              Join over 50,000 miners already earning daily BTC rewards with XHash.
-              No hardware, no hassle — just pure compute power at your fingertips.
-            </p>
-            <Link href="/register" className={styles.ctaBtn}>
-              Get Started Free <IconArrowRight />
-            </Link>
+            
+            <div className={styles.ctaContent}>
+              <div className={styles.ctaTextCol}>
+                <h2 className={styles.ctaTitle}>Ready to Start Mining?</h2>
+                <p className={styles.ctaBody}>
+                  Join over 50,000 miners already earning daily BTC rewards with XHash.
+                  No hardware, no hassle — just pure compute power at your fingertips.
+                </p>
+              </div>
+              <div className={styles.ctaAction}>
+                <Link href="/mining" className={styles.ctaBtn}>
+                  Explore Plans <IconArrowRight />
+                </Link>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>

@@ -283,6 +283,7 @@ export default function PaymentPartners() {
     <section className={styles.partners} id="payment-partners-section">
       <div className="container">
         <div className="section-header">
+          <p className="section-tag">// Partners</p>
           <h2 className="section-title">
             Payment <span className="gradient-text">Partners</span>
           </h2>

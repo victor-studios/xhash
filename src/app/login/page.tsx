@@ -16,7 +16,7 @@ export default function LoginPage() {
   const { login } = useAuth();
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -26,16 +26,14 @@ export default function LoginPage() {
     }
 
     setLoading(true);
-    // Simulate a brief loading state
-    setTimeout(() => {
-      const success = login(email, password);
-      if (success) {
-        router.push('/');
-      } else {
-        setError('Login failed. Please try again.');
-      }
+    const { success, error: authError } = await login(email, password);
+    
+    if (success) {
+      router.push('/');
+    } else {
+      setError(authError || 'Login failed. Please try again.');
       setLoading(false);
-    }, 600);
+    }
   };
 
   return (

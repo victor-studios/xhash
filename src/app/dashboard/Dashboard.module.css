@@ -1,79 +1,150 @@
-.balanceRow {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-lg);
+.topDashboardSection {
+  display: flex;
+  gap: var(--space-xl);
   margin-bottom: var(--space-xl);
 }
 
-.balanceCard {
-  display: flex;
-  align-items: center;
-  gap: var(--space-lg);
+.mainBalanceCard {
+  flex: 1.2;
   background: var(--bg-card);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
   padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-lg);
   transition: var(--transition-smooth);
 }
-
-.balanceCard:hover {
-  border-color: var(--border-card);
+.mainBalanceCard:hover {
+  border-color: var(--accent-primary);
+  box-shadow: 0 4px 20px rgba(108, 92, 231, 0.08);
 }
 
-.balanceIcon {
-  width: 64px;
-  height: 64px;
+.mainBalanceHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.balanceIconWrapper {
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
+  background: rgba(108, 92, 231, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
 
-.balancePair {
+.mainBalanceLabel {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.mainBalanceValue {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  line-height: 1;
+}
+
+.mainBalanceActions {
+  display: flex;
+  gap: var(--space-md);
+  margin-top: auto;
+}
+
+.mainActionBtn {
   flex: 1;
   display: flex;
-  gap: var(--space-xl);
-}
-
-.balanceItem {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.balanceLabel {
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.balanceValue {
-  font-size: 1.1rem;
-  font-weight: 700;
-  font-family: var(--font-mono);
-  color: var(--text-primary);
-}
-
-.actionBtn {
-  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 16px;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
   background: var(--gradient-primary);
-  border-radius: var(--radius-sm);
-  font-size: 0.75rem;
-  font-weight: 600;
   color: white;
   text-decoration: none;
-  margin-top: 6px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.9rem;
   transition: var(--transition-smooth);
-  width: fit-content;
+  border: 1px solid transparent;
+}
+.mainActionBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow-primary);
 }
 
-.actionBtn:hover {
-  box-shadow: var(--shadow-glow-primary);
-  transform: translateY(-1px);
+.mainActionBtn.btnOutline {
+  background: transparent;
+  color: var(--text-primary);
+  border-color: var(--border-accent);
+}
+.mainActionBtn.btnOutline:hover {
+  border-color: var(--accent-primary);
+  background: rgba(108, 92, 231, 0.05);
+  box-shadow: none;
+}
+
+.secondaryStatsGrid {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.secondaryStatCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md) var(--space-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  transition: var(--transition-smooth);
+  flex: 1;
+}
+.secondaryStatCard:hover {
+  border-color: var(--border-card);
+  transform: translateX(4px);
+}
+
+.statIconSmall {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.statContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.statLabel {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.statValue {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
 }
 
 .sectionTitle {
@@ -262,13 +333,8 @@
 
 /* ─── Responsive ─── */
 @media (max-width: 900px) {
-  .balanceRow {
-    grid-template-columns: 1fr;
-  }
-
-  .balancePair {
+  .topDashboardSection {
     flex-direction: column;
-    gap: var(--space-md);
   }
 
   .quickStats {
@@ -277,10 +343,18 @@
 }
 
 @media (max-width: 640px) {
-  .balanceCard {
-    flex-direction: column;
+  .mainBalanceCard {
     text-align: center;
     align-items: center;
+  }
+  
+  .mainBalanceHeader {
+    flex-direction: column;
+  }
+
+  .mainBalanceActions {
+    width: 100%;
+    flex-direction: column;
   }
 
   .quickStats {

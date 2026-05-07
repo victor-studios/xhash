@@ -11,6 +11,7 @@ export default function CryptoPrices() {
     <section className={styles.cryptoPrices} id="crypto-prices-section">
       <div className="container">
         <div className="section-header">
+          <p className="section-tag">// Market Data</p>
           <h2 className="section-title">Crypto <span className="gradient-text">Prices</span></h2>
           {lastUpdated && (
             <p className={styles.lastUpdated}>

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import {
   LayoutDashboard,
@@ -28,11 +28,17 @@ const sidebarLinks = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { logout } = useAuth();
 
   const isActive = (href: string) => {
     if (href === '/dashboard') return pathname === '/dashboard';
     return pathname.startsWith(href);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    router.push('/login');
   };
 
   return (
@@ -61,7 +67,7 @@ export default function Sidebar() {
           <Search size={16} />
           <span>Explore Plans</span>
         </Link>
-        <button onClick={logout} className={styles.logoutBtn}>
+        <button onClick={handleLogout} className={styles.logoutBtn}>
           <LogOut size={16} />
           <span>Log Out</span>
         </button>

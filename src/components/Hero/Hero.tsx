@@ -72,16 +72,14 @@ export default function Hero() {
               </h1>
 
               <p className={styles.heroDescription}>
-                Our supercomputer&apos;s consist of thousands of GPUs and ASICs to provide
-                the maximum performance for cryptocurrency mining. No equipment needed —
-                just sign up and start earning.
+                Harness the power of thousands of enterprise-grade GPUs and ASICs. Pure compute performance, zero hardware hassle.
               </p>
 
               <div className={styles.heroChecks}>
                 {[
-                  'No equipment or technical knowledge required',
-                  'Real-time mining performance tracking',
-                  'Instant withdrawals to your wallet',
+                  'Zero hardware maintenance required',
+                  'Live performance & reward tracking',
+                  'Instant daily payouts to your wallet',
                 ].map((text, i) => (
                   <div key={i} className={styles.heroCheck}>
                     <span className={styles.checkIcon}>✓</span>

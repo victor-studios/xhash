@@ -13,6 +13,7 @@ export default function TopDepositors() {
     <section className={styles.depositors} id="top-depositors-section">
       <div className="container">
         <div className="section-header">
+          <p className="section-tag">// Leaderboard</p>
           <h2 className="section-title">
             Top <span className="gradient-text">Depositors</span>
           </h2>
