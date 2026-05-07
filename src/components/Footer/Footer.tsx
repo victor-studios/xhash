@@ -36,6 +36,7 @@ export default function Footer() {
               <Link href="/mining" className={styles.footerLink}>Mine</Link>
               <Link href="/about" className={styles.footerLink}>Why Us</Link>
               <Link href="/blog" className={styles.footerLink}>Blog</Link>
+              <Link href="/affiliate" className={styles.footerLink}>Affiliate</Link>
             </div>
           </div>
 
