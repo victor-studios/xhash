@@ -79,7 +79,7 @@ export async function GET(req: NextRequest) {
 
 /**
  * PATCH /api/admin/transactions
- * Approve/reject withdrawals (Level 1, 2)
+ * Approve/reject withdrawals AND deposits (Level 1, 2)
  */
 export async function PATCH(req: NextRequest) {
   const admin = extractAdminToken(req.headers.get('authorization'));
@@ -102,15 +102,15 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: 'Transaction not found' }, { status: 404 });
     }
 
-    if (transaction.type !== 'withdraw') {
-      return NextResponse.json({ error: 'Can only approve/reject withdrawals' }, { status: 400 });
+    if (transaction.type !== 'withdraw' && transaction.type !== 'deposit') {
+      return NextResponse.json({ error: 'Can only approve/reject withdrawals and deposits' }, { status: 400 });
     }
 
     let newStatus = '';
     if (action === 'approve') {
       newStatus = 'Completed';
     } else if (action === 'reject') {
-      newStatus = 'Rejected';
+      newStatus = 'Failed';
     } else {
       return NextResponse.json({ error: 'Invalid action. Use approve or reject.' }, { status: 400 });
     }
@@ -125,35 +125,77 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: updateError.message }, { status: 500 });
     }
 
-    // If rejected, refund the amount back to user's balance
-    if (action === 'reject') {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('available_balance, total_withdrawn')
-        .eq('id', transaction.user_id)
-        .single();
-
-      if (profile) {
-        await supabase
+    // --- WITHDRAWAL LOGIC ---
+    if (transaction.type === 'withdraw') {
+      if (action === 'approve') {
+        // Withdrawal approved: increment total_withdrawn
+        const { data: profile } = await supabase
           .from('profiles')
-          .update({
-            available_balance: Number(profile.available_balance) + Number(transaction.amount),
-            total_withdrawn: Math.max(0, Number(profile.total_withdrawn) - Number(transaction.amount)),
-          })
-          .eq('id', transaction.user_id);
+          .select('total_withdrawn')
+          .eq('id', transaction.user_id)
+          .single();
+
+        if (profile) {
+          await supabase
+            .from('profiles')
+            .update({
+              total_withdrawn: Number(profile.total_withdrawn) + Number(transaction.amount),
+            })
+            .eq('id', transaction.user_id);
+        }
+      } else if (action === 'reject') {
+        // Withdrawal rejected: refund the amount back to user's balance
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('available_balance')
+          .eq('id', transaction.user_id)
+          .single();
+
+        if (profile) {
+          await supabase
+            .from('profiles')
+            .update({
+              available_balance: Number(profile.available_balance) + Number(transaction.amount),
+            })
+            .eq('id', transaction.user_id);
+        }
       }
     }
 
+    // --- DEPOSIT LOGIC (Bank Transfer approvals) ---
+    if (transaction.type === 'deposit') {
+      if (action === 'approve') {
+        // Deposit approved: credit the user's balance and total_deposit
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('available_balance, total_deposit')
+          .eq('id', transaction.user_id)
+          .single();
+
+        if (profile) {
+          await supabase
+            .from('profiles')
+            .update({
+              available_balance: Number(profile.available_balance) + Number(transaction.amount),
+              total_deposit: Number(profile.total_deposit) + Number(transaction.amount),
+            })
+            .eq('id', transaction.user_id);
+        }
+      }
+      // If deposit rejected, no balance changes needed (money was never credited)
+    }
+
     // Log activity
+    const actionType = transaction.type === 'deposit' ? 'deposit' : 'withdrawal';
     await supabase.from('admin_activity_log').insert({
       admin_id: admin.adminId,
       admin_username: admin.username,
-      action: `withdrawal_${action}`,
+      action: `${actionType}_${action}`,
       details: { transactionId, amount: transaction.amount, userId: transaction.user_id },
       target_user_id: transaction.user_id,
     });
 
-    return NextResponse.json({ message: `Withdrawal ${action}d successfully`, newStatus });
+    return NextResponse.json({ message: `${actionType} ${action}d successfully`, newStatus });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

@@ -96,7 +96,7 @@ export default function AdminWithdrawalsPage() {
         <button className={`admin-filter-btn ${filter === '' ? 'active' : ''}`} onClick={() => handleFilter('')}>All</button>
         <button className={`admin-filter-btn ${filter === 'In Progress' ? 'active' : ''}`} onClick={() => handleFilter('In Progress')}>Processing</button>
         <button className={`admin-filter-btn ${filter === 'Completed' ? 'active' : ''}`} onClick={() => handleFilter('Completed')}>Completed</button>
-        <button className={`admin-filter-btn ${filter === 'Rejected' ? 'active' : ''}`} onClick={() => handleFilter('Rejected')}>Rejected</button>
+        <button className={`admin-filter-btn ${filter === 'Failed' ? 'active' : ''}`} onClick={() => handleFilter('Failed')}>Rejected</button>
       </div>
 
       {loading ? (

@@ -38,6 +38,13 @@ BEGIN
       'Completed', 
       'Daily mining payout for active contracts'
     );
+
+    -- Log into mining_history so the dashboard graph is populated
+    INSERT INTO public.mining_history (user_id, date, earned, mined)
+    VALUES (v_user.user_id, current_date, v_user.total_daily_profit, v_user.total_daily_profit)
+    ON CONFLICT (user_id, date) 
+    DO UPDATE SET earned = mining_history.earned + EXCLUDED.earned,
+                  mined = mining_history.mined + EXCLUDED.mined;
   END LOOP;
 
   -- 2. PROCESS CONTRACT EXPIRATIONS

@@ -35,9 +35,9 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    // Get emails from auth.users for each profile
+    // Get emails and created_at from auth.users for each profile
     const userIds = users?.map(u => u.id) || [];
-    let userEmails: Record<string, string> = {};
+    let authDataMap: Record<string, any> = {};
     
     if (userIds.length > 0) {
       const { data: { users: authUsers } } = await supabase.auth.admin.listUsers({
@@ -46,14 +46,18 @@ export async function GET(req: NextRequest) {
       
       if (authUsers) {
         authUsers.forEach(u => {
-          userEmails[u.id] = u.email || '';
+          authDataMap[u.id] = {
+            email: u.email || '',
+            created_at: u.created_at || new Date().toISOString()
+          };
         });
       }
     }
 
     const enrichedUsers = users?.map(u => ({
       ...u,
-      email: userEmails[u.id] || 'N/A',
+      email: authDataMap[u.id]?.email || 'N/A',
+      created_at: authDataMap[u.id]?.created_at || new Date().toISOString()
     })) || [];
 
     return NextResponse.json({

@@ -65,15 +65,62 @@ export async function GET(req: NextRequest) {
     // Recent transactions (last 10)
     const { data: recentTransactions } = await supabase
       .from('transactions')
-      .select('*, profiles!transactions_user_id_fkey(username, display_name)')
+      .select('*')
       .order('created_at', { ascending: false })
       .limit(10);
 
+    const txUserIds = [...new Set(recentTransactions?.map(tx => tx.user_id) || [])];
+    let txProfiles: Record<string, any> = {};
+    if (txUserIds.length > 0) {
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, username, display_name')
+        .in('id', txUserIds);
+      if (profiles) {
+        profiles.forEach(p => {
+          txProfiles[p.id] = p;
+        });
+      }
+    }
+
+    const enrichedTransactions = recentTransactions?.map(tx => ({
+      ...tx,
+      profiles: txProfiles[tx.user_id] || { username: 'Unknown', display_name: 'Unknown User' }
+    })) || [];
+
     // Recent users (last 5)
-    const { data: recentUsers } = await supabase
-      .from('profiles')
-      .select('id, username, display_name, available_balance')
-      .limit(5);
+    // Fetch auth users to get true created_at
+    const { data: { users: authUsers } } = await supabase.auth.admin.listUsers({
+      perPage: 1000,
+    });
+    
+    const sortedAuthUsers = (authUsers || []).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    const recentAuthUsers = sortedAuthUsers.slice(0, 5);
+    const recentAuthUserIds = recentAuthUsers.map(u => u.id);
+    
+    let recentProfilesMap: Record<string, any> = {};
+    if (recentAuthUserIds.length > 0) {
+      const { data: rProfiles } = await supabase
+        .from('profiles')
+        .select('id, username, display_name, available_balance')
+        .in('id', recentAuthUserIds);
+      if (rProfiles) {
+        rProfiles.forEach(p => {
+          recentProfilesMap[p.id] = p;
+        });
+      }
+    }
+    
+    const enrichedRecentUsers = recentAuthUsers.map(u => {
+      const p = recentProfilesMap[u.id] || {};
+      return {
+        id: u.id,
+        username: p.username,
+        display_name: p.display_name,
+        available_balance: p.available_balance || 0,
+        created_at: u.created_at,
+      };
+    });
 
     return NextResponse.json({
       totalUsers: totalUsers || 0,
@@ -84,8 +131,8 @@ export async function GET(req: NextRequest) {
       totalOrders: totalOrders || 0,
       openTickets: openTickets || 0,
       revenue: totalDeposits - totalWithdrawals,
-      recentTransactions: recentTransactions || [],
-      recentUsers: recentUsers || [],
+      recentTransactions: enrichedTransactions,
+      recentUsers: enrichedRecentUsers,
     });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
