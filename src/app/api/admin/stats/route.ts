@@ -5,6 +5,8 @@ import { extractAdminToken } from '@/lib/admin-auth';
 /**
  * GET /api/admin/stats
  * Platform overview statistics
+ * 
+ * Valid transaction_status enum values: 'Completed', 'Failed', 'In Progress', 'Waiting for payment'
  */
 export async function GET(req: NextRequest) {
   const admin = extractAdminToken(req.headers.get('authorization'));
@@ -20,7 +22,7 @@ export async function GET(req: NextRequest) {
       .from('profiles')
       .select('*', { count: 'exact', head: true });
 
-    // Total deposits
+    // ── Deposit stats ──
     const { data: depositData } = await supabase
       .from('transactions')
       .select('amount')
@@ -29,46 +31,64 @@ export async function GET(req: NextRequest) {
     
     const totalDeposits = depositData?.reduce((sum, t) => sum + Number(t.amount), 0) || 0;
 
-    // Total withdrawals
-    const { data: withdrawData } = await supabase
+    // ── Withdrawal stats (only valid enum values) ──
+    const { data: withdrawCompletedData } = await supabase
       .from('transactions')
       .select('amount')
       .eq('type', 'withdraw')
-      .in('status', ['Completed', 'Confirmed']);
+      .eq('status', 'Completed');
     
-    const totalWithdrawals = withdrawData?.reduce((sum, t) => sum + Number(t.amount), 0) || 0;
+    const totalWithdrawals = withdrawCompletedData?.reduce((sum, t) => sum + Number(t.amount), 0) || 0;
 
-    // Pending withdrawals
+    // Pending withdrawals — 'In Progress' is the valid pending-like status
     const { count: pendingWithdrawals } = await supabase
       .from('transactions')
       .select('*', { count: 'exact', head: true })
       .eq('type', 'withdraw')
-      .in('status', ['Pending', 'Processing', 'In Progress']);
+      .eq('status', 'In Progress');
 
-    // Active orders
+    // Pending deposits — 'Waiting for payment'
+    const { count: pendingDeposits } = await supabase
+      .from('transactions')
+      .select('*', { count: 'exact', head: true })
+      .eq('type', 'deposit')
+      .eq('status', 'Waiting for payment');
+
+    // Failed transactions
+    const { count: failedTransactions } = await supabase
+      .from('transactions')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'Failed');
+
+    // ── Order stats ──
     const { count: activeOrders } = await supabase
       .from('orders')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'active');
 
-    // Total orders
     const { count: totalOrders } = await supabase
       .from('orders')
       .select('*', { count: 'exact', head: true });
 
-    // Open support tickets
-    const { count: openTickets } = await supabase
-      .from('support_messages')
-      .select('*', { count: 'exact', head: true })
-      .in('status', ['open', 'in_progress']);
+    // ── Support ──
+    let openTickets = 0;
+    try {
+      const { count } = await supabase
+        .from('support_messages')
+        .select('*', { count: 'exact', head: true });
+      openTickets = count || 0;
+    } catch {
+      // Table might not exist
+    }
 
-    // Recent transactions (last 10)
+    // ── Recent transactions (last 5) ──
     const { data: recentTransactions } = await supabase
       .from('transactions')
       .select('*')
       .order('created_at', { ascending: false })
-      .limit(10);
+      .limit(5);
 
+    // Enrich transactions with profile data
     const txUserIds = [...new Set(recentTransactions?.map(tx => tx.user_id) || [])];
     let txProfiles: Record<string, any> = {};
     if (txUserIds.length > 0) {
@@ -85,18 +105,19 @@ export async function GET(req: NextRequest) {
 
     const enrichedTransactions = recentTransactions?.map(tx => ({
       ...tx,
-      profiles: txProfiles[tx.user_id] || { username: 'Unknown', display_name: 'Unknown User' }
+      profiles: txProfiles[tx.user_id] || { username: 'unknown', display_name: 'Unknown User' }
     })) || [];
 
-    // Recent users (last 5)
-    // Fetch auth users to get true created_at
+    // ── Recent users (last 5, sorted by actual signup date) ──
     const { data: { users: authUsers } } = await supabase.auth.admin.listUsers({
       perPage: 1000,
     });
     
-    const sortedAuthUsers = (authUsers || []).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-    const recentAuthUsers = sortedAuthUsers.slice(0, 5);
-    const recentAuthUserIds = recentAuthUsers.map(u => u.id);
+    const sortedAuthUsers = (authUsers || [])
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .slice(0, 5);
+    
+    const recentAuthUserIds = sortedAuthUsers.map(u => u.id);
     
     let recentProfilesMap: Record<string, any> = {};
     if (recentAuthUserIds.length > 0) {
@@ -111,10 +132,11 @@ export async function GET(req: NextRequest) {
       }
     }
     
-    const enrichedRecentUsers = recentAuthUsers.map(u => {
+    const enrichedRecentUsers = sortedAuthUsers.map(u => {
       const p = recentProfilesMap[u.id] || {};
       return {
         id: u.id,
+        email: u.email || '',
         username: p.username,
         display_name: p.display_name,
         available_balance: p.available_balance || 0,
@@ -127,14 +149,17 @@ export async function GET(req: NextRequest) {
       totalDeposits,
       totalWithdrawals,
       pendingWithdrawals: pendingWithdrawals || 0,
+      pendingDeposits: pendingDeposits || 0,
+      failedTransactions: failedTransactions || 0,
       activeOrders: activeOrders || 0,
       totalOrders: totalOrders || 0,
-      openTickets: openTickets || 0,
+      openTickets,
       revenue: totalDeposits - totalWithdrawals,
       recentTransactions: enrichedTransactions,
       recentUsers: enrichedRecentUsers,
     });
   } catch (error: any) {
+    console.error('Admin stats error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

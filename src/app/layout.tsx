@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import ClientProviders from './providers';
 import CryptoTicker from '@/components/CryptoTicker/CryptoTicker';
 import Navbar from '@/components/Navbar/Navbar';
-import { ConditionalFooter } from '@/components/ConditionalLayout';
+import { ConditionalFooter, ConditionalMain } from '@/components/ConditionalLayout';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -26,9 +26,9 @@ export default function RootLayout({
         <ClientProviders>
           <CryptoTicker />
           <Navbar />
-          <main style={{ paddingTop: 'calc(var(--navbar-height) + var(--ticker-height, 32px))' }}>
+          <ConditionalMain>
             {children}
-          </main>
+          </ConditionalMain>
           <ConditionalFooter />
         </ClientProviders>
       </body>

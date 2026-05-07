@@ -5,53 +5,20 @@ const SUPABASE_SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3Mi
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-async function testStats() {
-  // 1. Check which tables exist
-  const { data: tables } = await supabase.rpc('', {}).catch(() => ({ data: null }));
+async function check() {
+  const validStatuses = ['Completed', 'Failed', 'In Progress', 'Waiting for payment', 'Cancelled', 'Rejected', 'Approved', 'Refunded'];
   
-  // Alternative: check tables via information_schema using a raw query workaround
-  const { data: allTx, error: txErr } = await supabase
-    .from('transactions')
-    .select('id, type, status, amount, created_at')
-    .order('created_at', { ascending: false });
-  console.log('=== ALL TRANSACTIONS ===');
-  console.log(JSON.stringify(allTx, null, 2));
-  
-  // 2. Test withdrawal query exactly as in the API
-  const { data: withdrawData, error: wErr } = await supabase
-    .from('transactions')
-    .select('amount')
-    .eq('type', 'withdraw')
-    .in('status', ['Completed', 'Confirmed']);
-  console.log('\n=== WITHDRAW COMPLETED/CONFIRMED ===');
-  console.log('Data:', withdrawData);
-  console.log('Error:', wErr);
-  const totalWithdrawals = withdrawData?.reduce((sum, t) => sum + Number(t.amount), 0) || 0;
-  console.log('Total:', totalWithdrawals);
-  
-  // 3. Pending withdrawals
-  const { count: pendingWithdrawals, error: pErr } = await supabase
-    .from('transactions')
-    .select('*', { count: 'exact', head: true })
-    .eq('type', 'withdraw')
-    .in('status', ['Pending', 'Processing', 'In Progress']);
-  console.log('\n=== PENDING WITHDRAWALS ===');
-  console.log('Count:', pendingWithdrawals, 'Error:', pErr);
-  
-  // 4. Check if support_messages table exists
-  const { data: supportData, error: supportErr } = await supabase
-    .from('support_messages')
-    .select('*', { count: 'exact', head: true });
-  console.log('\n=== SUPPORT MESSAGES TABLE ===');
-  console.log('Data:', supportData, 'Error:', supportErr);
-  
-  // 5. Check orders table  
-  const { data: orders, count: totalOrders, error: oErr } = await supabase
-    .from('orders')
-    .select('*', { count: 'exact' });
-  console.log('\n=== ORDERS ===');
-  console.log('Count:', totalOrders, 'Error:', oErr);
-  console.log('Data:', JSON.stringify(orders, null, 2));
+  for (const status of validStatuses) {
+    const { error } = await supabase
+      .from('transactions')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', status);
+    if (!error) {
+      console.log(`Status "${status}" is VALID`);
+    } else {
+      console.log(`Status "${status}" is INVALID: ${error.message}`);
+    }
+  }
 }
 
-testStats().catch(console.error);
+check().catch(console.error);

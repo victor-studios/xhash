@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAdmin } from '../layout';
-import { Search, Loader2, Trash2, DollarSign, X } from 'lucide-react';
+import { Search, Loader2, Trash2, DollarSign, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function AdminUsersPage() {
   const { admin, token } = useAdmin();
@@ -10,6 +10,8 @@ export default function AdminUsersPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const limit = 10;
 
   // Balance modal
   const [balanceModal, setBalanceModal] = useState<any>(null);
@@ -19,11 +21,11 @@ export default function AdminUsersPage() {
   // Delete modal
   const [deleteModal, setDeleteModal] = useState<any>(null);
 
-  const fetchUsers = async (searchQuery = '') => {
+  const fetchUsers = async (searchQuery = '', p = 1) => {
     if (!token) return;
     setLoading(true);
     try {
-      const res = await fetch(`/api/admin/users?search=${searchQuery}&limit=100`, {
+      const res = await fetch(`/api/admin/users?search=${searchQuery}&limit=${limit}&page=${p}`, {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       if (res.ok) {
@@ -39,12 +41,13 @@ export default function AdminUsersPage() {
   };
 
   useEffect(() => {
-    fetchUsers();
-  }, [token]); // eslint-disable-line react-hooks/exhaustive-deps
+    fetchUsers(search, page);
+  }, [token, page]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    fetchUsers(search);
+    setPage(1);
+    fetchUsers(search, 1);
   };
 
   const handleAdjustBalance = async () => {
@@ -66,7 +69,7 @@ export default function AdminUsersPage() {
       if (res.ok) {
         setBalanceModal(null);
         setBalanceAmount('');
-        fetchUsers(search);
+        fetchUsers(search, page);
       }
     } catch (err) {
       console.error(err);
@@ -89,7 +92,7 @@ export default function AdminUsersPage() {
       });
       if (res.ok) {
         setDeleteModal(null);
-        fetchUsers(search);
+        fetchUsers(search, page);
       }
     } catch (err) {
       console.error(err);
@@ -98,6 +101,7 @@ export default function AdminUsersPage() {
     }
   };
 
+  const totalPages = Math.ceil(total / limit);
   const isLevel1 = admin?.level === 1;
 
   return (
@@ -118,88 +122,114 @@ export default function AdminUsersPage() {
         </form>
       </div>
 
-      {loading ? (
+      {loading && users.length === 0 ? (
         <div className="admin-loading">
           <Loader2 size={24} className="animate-spin" />
           Loading users...
         </div>
       ) : (
-        <div className="admin-table-wrap">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>User</th>
-                <th>Email</th>
-                <th>Balance</th>
-                <th>Deposited</th>
-                <th>Earned</th>
-                <th>Withdrawn</th>
-                <th>Joined</th>
-                {isLevel1 && <th>Actions</th>}
-              </tr>
-            </thead>
-            <tbody>
-              {users.length === 0 ? (
+        <>
+          <div className="admin-table-wrap admin-table-wrap-fixed">
+            <table className="admin-table">
+              <thead>
                 <tr>
-                  <td colSpan={isLevel1 ? 8 : 7} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
-                    No users found
-                  </td>
+                  <th>User</th>
+                  <th>Email</th>
+                  <th>Balance</th>
+                  <th>Deposited</th>
+                  <th>Earned</th>
+                  <th>Withdrawn</th>
+                  <th>Joined</th>
+                  {isLevel1 && <th>Actions</th>}
                 </tr>
-              ) : (
-                users.map((user) => (
-                  <tr key={user.id}>
-                    <td>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                        <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
-                          {user.display_name || 'User'}
-                        </span>
-                        <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
-                          @{user.username || user.id?.substring(0, 8)}
-                        </span>
-                      </div>
+              </thead>
+              <tbody style={{ opacity: loading ? 0.5 : 1, transition: 'opacity 0.2s' }}>
+                {users.length === 0 ? (
+                  <tr>
+                    <td colSpan={isLevel1 ? 8 : 7} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
+                      No users found
                     </td>
-                    <td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem' }}>{user.email}</td>
-                    <td style={{ fontFamily: 'var(--font-mono)', color: 'var(--accent-green)', fontWeight: 600 }}>
-                      ${Number(user.available_balance || 0).toFixed(2)}
-                    </td>
-                    <td style={{ fontFamily: 'var(--font-mono)' }}>
-                      ${Number(user.total_deposit || 0).toFixed(2)}
-                    </td>
-                    <td style={{ fontFamily: 'var(--font-mono)' }}>
-                      ${Number(user.total_earned || 0).toFixed(2)}
-                    </td>
-                    <td style={{ fontFamily: 'var(--font-mono)' }}>
-                      ${Number(user.total_withdrawn || 0).toFixed(2)}
-                    </td>
-                    <td style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                      {new Date(user.created_at).toLocaleDateString()}
-                    </td>
-                    {isLevel1 && (
+                  </tr>
+                ) : (
+                  users.map((user) => (
+                    <tr key={user.id}>
                       <td>
-                        <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
-                          <button
-                            className="admin-btn admin-btn-primary admin-btn-sm"
-                            onClick={() => setBalanceModal(user)}
-                            title="Adjust Balance"
-                          >
-                            <DollarSign size={12} />
-                          </button>
-                          <button
-                            className="admin-btn admin-btn-red admin-btn-sm"
-                            onClick={() => setDeleteModal(user)}
-                            title="Delete User"
-                          >
-                            <Trash2 size={12} />
-                          </button>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                          <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
+                            {user.display_name || 'User'}
+                          </span>
+                          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+                            @{user.username || user.id?.substring(0, 8)}
+                          </span>
                         </div>
                       </td>
-                    )}
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                      <td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem' }}>{user.email}</td>
+                      <td style={{ fontFamily: 'var(--font-mono)', color: 'var(--accent-green)', fontWeight: 600 }}>
+                        ${Number(user.available_balance || 0).toFixed(2)}
+                      </td>
+                      <td style={{ fontFamily: 'var(--font-mono)' }}>
+                        ${Number(user.total_deposit || 0).toFixed(2)}
+                      </td>
+                      <td style={{ fontFamily: 'var(--font-mono)' }}>
+                        ${Number(user.total_earned || 0).toFixed(2)}
+                      </td>
+                      <td style={{ fontFamily: 'var(--font-mono)' }}>
+                        ${Number(user.total_withdrawn || 0).toFixed(2)}
+                      </td>
+                      <td style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                        {new Date(user.created_at).toLocaleDateString()}
+                      </td>
+                      {isLevel1 && (
+                        <td>
+                          <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
+                            <button
+                              className="admin-btn admin-btn-primary admin-btn-sm"
+                              onClick={() => setBalanceModal(user)}
+                              title="Adjust Balance"
+                            >
+                              <DollarSign size={12} />
+                            </button>
+                            <button
+                              className="admin-btn admin-btn-red admin-btn-sm"
+                              onClick={() => setDeleteModal(user)}
+                              title="Delete User"
+                            >
+                              <Trash2 size={12} />
+                            </button>
+                          </div>
+                        </td>
+                      )}
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {totalPages > 1 && (
+            <div className="admin-pagination">
+              <button 
+                className="admin-pagination-btn"
+                disabled={page === 1 || loading}
+                onClick={() => setPage(prev => prev - 1)}
+              >
+                <ChevronLeft size={20} />
+              </button>
+              
+              <div className="admin-pagination-info">
+                Page {page} of {totalPages}
+              </div>
+
+              <button 
+                className="admin-pagination-btn"
+                disabled={page === totalPages || loading}
+                onClick={() => setPage(prev => prev + 1)}
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
+          )}
+        </>
       )}
 
       {/* Balance Adjustment Modal */}

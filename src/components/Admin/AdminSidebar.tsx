@@ -12,6 +12,7 @@ import {
   Activity,
   LogOut,
   Shield,
+  History,
 } from 'lucide-react';
 import XHashLogo from '@/components/XHashLogo/XHashLogo';
 import styles from './AdminSidebar.module.css';
@@ -53,10 +54,11 @@ export default function AdminSidebar({ admin }: AdminSidebarProps) {
 
   // Build nav links based on admin level
   const navLinks = [
-    { label: 'Overview', href: '/admin', icon: LayoutDashboard, minLevel: 3 },
+    { label: 'Overview', href: '/admin', icon: LayoutDashboard, minLevel: 2 },
     { label: 'Users', href: '/admin/users', icon: Users, minLevel: 2 },
     { label: 'Deposits', href: '/admin/deposits', icon: Wallet, minLevel: 2 },
     { label: 'Withdrawals', href: '/admin/withdrawals', icon: ArrowUpFromLine, minLevel: 2 },
+    { label: 'Transactions', href: '/admin/transactions', icon: History, minLevel: 2 },
     { label: 'Support', href: '/admin/support', icon: MessageSquare, minLevel: 3 },
     { label: 'Manage Admins', href: '/admin/manage-admins', icon: ShieldCheck, minLevel: 1 },
     { label: 'Activity Log', href: '/admin/activity', icon: Activity, minLevel: 1 },

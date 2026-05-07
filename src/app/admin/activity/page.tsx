@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAdmin } from '../layout';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const actionLabels: Record<string, string> = {
   login: '🔐 Logged in',
@@ -21,12 +21,15 @@ export default function AdminActivityPage() {
   const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const limit = 10;
 
   useEffect(() => {
     async function fetchLogs() {
       if (!token) return;
+      setLoading(true);
       try {
-        const res = await fetch('/api/admin/activity?limit=100', {
+        const res = await fetch(`/api/admin/activity?limit=${limit}&page=${page}`, {
           headers: { 'Authorization': `Bearer ${token}` },
         });
         if (res.ok) {
@@ -38,7 +41,9 @@ export default function AdminActivityPage() {
       finally { setLoading(false); }
     }
     fetchLogs();
-  }, [token]);
+  }, [token, page]);
+
+  const totalPages = Math.ceil(total / limit);
 
   return (
     <>
@@ -49,7 +54,7 @@ export default function AdminActivityPage() {
         </div>
       </div>
 
-      {loading ? (
+      {loading && logs.length === 0 ? (
         <div className="admin-loading"><Loader2 size={24} className="animate-spin" /> Loading...</div>
       ) : logs.length === 0 ? (
         <div className="admin-card">
@@ -59,36 +64,62 @@ export default function AdminActivityPage() {
           </div>
         </div>
       ) : (
-        <div className="admin-table-wrap">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Admin</th>
-                <th>Action</th>
-                <th>Details</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {logs.map(log => (
-                <tr key={log.id}>
-                  <td style={{ fontWeight: 600, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>
-                    @{log.admin_username || 'Unknown'}
-                  </td>
-                  <td style={{ color: 'var(--text-primary)' }}>
-                    {actionLabels[log.action] || log.action}
-                  </td>
-                  <td style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {log.details ? JSON.stringify(log.details) : '—'}
-                  </td>
-                  <td style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
-                    {new Date(log.created_at).toLocaleString()}
-                  </td>
+        <>
+          <div className="admin-table-wrap admin-table-wrap-fixed">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Admin</th>
+                  <th>Action</th>
+                  <th>Details</th>
+                  <th>Date</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody style={{ opacity: loading ? 0.5 : 1, transition: 'opacity 0.2s' }}>
+                {logs.map(log => (
+                  <tr key={log.id}>
+                    <td style={{ fontWeight: 600, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>
+                      @{log.admin_username || 'Unknown'}
+                    </td>
+                    <td style={{ color: 'var(--text-primary)' }}>
+                      {actionLabels[log.action] || log.action}
+                    </td>
+                    <td title={log.details ? JSON.stringify(log.details) : ''} style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {log.details ? JSON.stringify(log.details) : '—'}
+                    </td>
+                    <td style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+                      {new Date(log.created_at).toLocaleString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {totalPages > 1 && (
+            <div className="admin-pagination">
+              <button 
+                className="admin-pagination-btn"
+                disabled={page === 1 || loading}
+                onClick={() => setPage(prev => prev - 1)}
+              >
+                <ChevronLeft size={20} />
+              </button>
+              
+              <div className="admin-pagination-info">
+                Page {page} of {totalPages}
+              </div>
+
+              <button 
+                className="admin-pagination-btn"
+                disabled={page === totalPages || loading}
+                onClick={() => setPage(prev => prev + 1)}
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
+          )}
+        </>
       )}
     </>
   );
