@@ -118,45 +118,25 @@ export async function POST(req: Request) {
     const priceUsd = await getCryptoPriceUsd(assetCode);
     const amountUsd = parseFloat(paymentAmount) * priceUsd;
 
-    const { data: profile, error: profileError } = await supabaseAdmin
-      .from('profiles')
-      .select('available_balance, total_deposit')
-      .eq('id', userId)
-      .single();
+    const { data: rpcData, error: rpcError } = await supabaseAdmin.rpc('process_deposit', {
+      p_user_id: userId,
+      p_amount_usd: amountUsd,
+      p_crypto_amount: parseFloat(paymentAmount),
+      p_crypto_currency: assetCode.toUpperCase(),
+      p_network: networkCode || assetCode.toUpperCase(),
+      p_tx_hash: txHash || `manual_${Date.now()}`,
+      p_description: `Deposit of ${paymentAmount} ${assetCode.toUpperCase()}`
+    });
 
-    if (profileError || !profile) {
-      return NextResponse.json({ error: 'User profile not found' }, { status: 404 });
+    if (rpcError) {
+      console.error('RPC process_deposit error:', rpcError);
+      return NextResponse.json({ error: 'Failed to process deposit atomically' }, { status: 500 });
     }
 
-    const newBalance = Number(profile.available_balance || 0) + amountUsd;
-    const newTotalDeposit = Number(profile.total_deposit || 0) + amountUsd;
-
-    const { error: updateError } = await supabaseAdmin
-      .from('profiles')
-      .update({ 
-        available_balance: newBalance,
-        total_deposit: newTotalDeposit
-      })
-      .eq('id', userId);
-
-    if (updateError) throw updateError;
-
-    const { error: txError } = await supabaseAdmin
-      .from('transactions')
-      .insert({
-        user_id: userId,
-        type: 'deposit',
-        amount: amountUsd,
-        currency: 'USD',
-        crypto_amount: paymentAmount,
-        crypto_currency: assetCode.toUpperCase(),
-        network: networkCode || assetCode.toUpperCase(),
-        tx_hash: txHash || `manual_${Date.now()}`,
-        status: 'Completed',
-        description: `Deposit of ${paymentAmount} ${assetCode.toUpperCase()}`
-      });
-
-    if (txError) console.error('Failed to insert transaction log:', txError);
+    if (!rpcData?.success) {
+      console.error('RPC process_deposit failed:', rpcData?.error);
+      return NextResponse.json({ error: rpcData?.error || 'Deposit failed' }, { status: 400 });
+    }
 
     return NextResponse.json({ success: true, credited_usd: amountUsd }, { status: 200 });
   } catch (error) {

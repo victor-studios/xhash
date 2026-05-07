@@ -43,58 +43,33 @@ export default function PackageDetail({ pkg }: PackageDetailProps) {
     if (!user || purchasing) return;
     setPurchasing(true);
 
-    const totalCost = pkg.price * quantity;
-
     try {
-      // 1. Deduct balance from profile
-      const { data: profile, error: profileErr } = await supabase
-        .from('profiles')
-        .select('available_balance')
-        .eq('id', user.id)
-        .single();
+      // Atomic RPC: deducts balance, creates orders, logs transaction in one DB transaction
+      const { data, error } = await supabase.rpc('purchase_mining_plan', {
+        p_user_id: user.id,
+        p_package_slug: pkg.slug,
+        p_price: pkg.price,
+        p_quantity: quantity,
+        p_description: `Purchased ${quantity}x ${pkg.name} mining contract`,
+      });
 
-      if (profileErr || !profile) throw new Error('Could not fetch profile');
-
-      const currentBalance = Number(profile.available_balance || 0);
-      if (currentBalance < totalCost) {
-        toast({ variant: 'error', title: 'Insufficient Balance', message: 'Your balance has changed. Please top up.' });
-        setShowConfirm(false);
-        setPurchasing(false);
-        return;
+      if (error) {
+        console.error('RPC Error:', error);
+        throw new Error('Failed to process purchase');
       }
 
-      const newBalance = currentBalance - totalCost;
+      if (!data.success) {
+        if (data.error === 'Insufficient funds') {
+          toast({ variant: 'error', title: 'Insufficient Balance', message: 'Your balance has changed. Please top up.' });
+          setShowConfirm(false);
+          setPurchasing(false);
+          return;
+        }
+        throw new Error(data.error || 'Purchase failed');
+      }
 
-      const { error: updateErr } = await supabase
-        .from('profiles')
-        .update({ available_balance: newBalance })
-        .eq('id', user.id);
-      if (updateErr) throw updateErr;
-
-      // 2. Create order(s)
-      const orderInserts = Array.from({ length: quantity }, () => ({
-        user_id: user.id,
-        package_id: pkg.slug,
-        amount: pkg.price,
-        status: 'active',
-      }));
-
-      const { error: orderErr } = await supabase.from('orders').insert(orderInserts);
-      if (orderErr) throw orderErr;
-
-      // 3. Create transaction record
-      const { error: txErr } = await supabase.from('transactions').insert({
-        user_id: user.id,
-        type: 'order',
-        amount: totalCost,
-        currency: 'USD',
-        status: 'Completed',
-        description: `Purchased ${quantity}x ${pkg.name} mining contract`,
-      });
-      if (txErr) console.error('Transaction log error:', txErr);
-
-      // 4. Update local state
-      updateBalance(newBalance);
+      // Update local state with the new balance from the server
+      updateBalance(data.new_balance);
 
       setShowConfirm(false);
       setShowSuccess(true);

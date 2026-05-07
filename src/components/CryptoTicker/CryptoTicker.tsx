@@ -1,10 +1,15 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import { useCryptoPrices } from '@/lib/use-crypto-prices';
 import styles from './CryptoTicker.module.css';
 
 export default function CryptoTicker() {
   const { prices } = useCryptoPrices();
+  const pathname = usePathname();
+
+  // Hide on admin pages
+  if (pathname.startsWith('/admin')) return null;
 
   if (!prices.length) return null;
 

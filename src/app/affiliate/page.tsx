@@ -36,9 +36,9 @@ export default function AffiliatePage() {
         <div className={styles.pageHero}>
           <h1 className={styles.pageTitle}>Affiliate</h1>
           <p className={styles.pageSubtitle}>
-            Lorem ipsum dolor sit amet consectetur. Viverra arcu velit sit eget sed mauris dignissim id.
-            Commodo lorem at nunc risus rhoncus suspendisse sed dui vitae. Nisl libero pulvinar feugiat
-            amet purus sed a. Bibendum sed scelerisque id dui.
+            Earn passive income by sharing XHash with your network. Receive up to 4.5% commission on every
+            mining contract purchased through your unique referral link — no deposit or investment required
+            on your end. Start earning today with unlimited referrals and instant payouts.
           </p>
         </div>
 

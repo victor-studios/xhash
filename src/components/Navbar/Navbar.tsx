@@ -15,6 +15,9 @@ export default function Navbar() {
   const pathname = usePathname();
   const { user, isLoggedIn } = useAuth();
 
+  // Hide navbar entirely on admin pages
+  if (pathname.startsWith('/admin')) return null;
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);

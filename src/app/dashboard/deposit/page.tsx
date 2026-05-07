@@ -316,18 +316,18 @@ export default function DepositPage() {
             ) : (
               depositHistory.map((row) => (
                 <div key={row.id} className={styles.historyItem} onClick={() => handleRowAction(row)}>
-                  <div className={styles.historyItemLeft}>
-                    <div className={styles.historyStatusIcon} style={{ color: getStatusColor(row.status) }}>
-                      {getStatusIcon(row.status)}
-                    </div>
-                    <div className={styles.historyItemInfo}>
+                  <div className={styles.historyItemRow}>
+                    <div className={styles.historyStatusWrapper}>
+                      <div className={styles.historyStatusIcon} style={{ color: getStatusColor(row.status) }}>
+                        {getStatusIcon(row.status)}
+                      </div>
                       <span className={styles.historyStatus} style={{ color: getStatusColor(row.status) }}>
                         {row.status}
                       </span>
-                      <span className={styles.historyTime}>{timeAgo(row.created_at)}</span>
                     </div>
+                    <span className={styles.historyTime}>{timeAgo(row.created_at)}</span>
                   </div>
-                  <div className={styles.historyItemRight}>
+                  <div className={styles.historyItemBottom}>
                     <span className={styles.historyAmount}>${row.amount}</span>
                     <span className={styles.historyCrypto}>{row.currency}</span>
                     {row.status === 'Waiting for payment' && (
