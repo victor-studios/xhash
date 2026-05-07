@@ -1,17 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import Input from '@/components/ui/Input';
 import styles from '@/components/AuthForm/AuthForm.module.css';
 
-export default function RegisterPage() {
+function RegisterForm() {
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [affiliateCode, setAffiliateCode] = useState(searchParams.get('r') || '');
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -37,7 +39,7 @@ export default function RegisterPage() {
     }
 
     setLoading(true);
-    const { success, error: authError } = await register(email, password);
+    const { success, error: authError } = await register(email, password, affiliateCode);
     setLoading(false);
 
     if (success) {
@@ -112,6 +114,14 @@ export default function RegisterPage() {
                   />
                 </div>
 
+                <Input
+                  type="text"
+                  placeholder="Affiliate Code (Optional)"
+                  id="register-affiliate"
+                  value={affiliateCode}
+                  onChange={(e) => setAffiliateCode(e.target.value)}
+                />
+
                 {error && <div className={styles.errorMsg}>{error}</div>}
 
                 <div className={styles.termsRow}>
@@ -183,5 +193,13 @@ export default function RegisterPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
+      <RegisterForm />
+    </Suspense>
   );
 }

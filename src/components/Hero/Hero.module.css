@@ -69,7 +69,7 @@
   position: absolute;
   top: 5%;
   right: 0;
-  width: 42%;
+  width: 55%;
   height: 88%;
   display: flex;
   align-items: center;
@@ -79,29 +79,13 @@
 }
 
 .rigWrapper {
-  position: absolute;
-  top: 5%;
-  right: 0;
-  width: 42%;
-  height: 88%;
-  overflow: hidden;
-  z-index: 1; /* ABOVE rings (z-index:0), BELOW section (z-index:2) */
-  pointer-events: none;
-  transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* === SCROLLED / BACKGROUND MODE === */
-.rigBackground {
   position: fixed;
-  right: -2%;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 42%;
-  height: 65vh;
-
-  /* More transparent so sections feel lighter */
-  opacity: 0.65;
-  z-index: 0;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0; /* ABOVE rings (z-index:0), BELOW section (z-index:2) */
+  pointer-events: none;
 }
 
 /* ── Gradient masks — cover ALL Sketchfab UI chrome ── */

@@ -1,53 +1,24 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
 import { heroStats } from '@/data/content';
 import styles from './Hero.module.css';
+import MiningRig3D from '@/components/MiningRig3D/MiningRig3D';
 
 export default function Hero() {
   const heroRef = useRef<HTMLElement>(null);
-  const [pastHero, setPastHero] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!heroRef.current) return;
-      const heroBottom = heroRef.current.getBoundingClientRect().bottom;
-      setPastHero(heroBottom < 80);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   return (
     <>
-      {/* ══ Decorative rings — z-index 0, behind the 3D rig ══ */}
+      {/* ══ 3D Mining Rig — fixed full-screen, self-manages scroll ══ */}
+      <MiningRig3D />
+
+      {/* ══ Decorative rings ══ */}
       <div className={styles.ringsContainer} aria-hidden="true">
         <div className={styles.rigRing} />
         <div className={styles.rigRingOuter} />
-      </div>
-
-      {/* ══ Sketchfab 3D Mining Rig — z-index 1, above rings ══
-          Hero state   → right column of hero (absolute)
-          Scrolled     → fixed right-center, 42% width background */}
-      <div
-        className={`${styles.rigWrapper} ${pastHero ? styles.rigBackground : ''}`}
-        aria-hidden="true"
-      >
-        <div className={styles.maskBottom} />
-        <div className={styles.maskTop} />
-        <div className={styles.maskLeft} />
-        <div className={styles.maskRight} />
-        <div className={styles.iframeGlow} />
-
-        <iframe
-          title="Crypto Farm / Mining Rig 3D"
-          frameBorder="0"
-          allow="autoplay; fullscreen; xr-spatial-tracking"
-          src="https://sketchfab.com/models/049f02ffd15c41ca8cb8020feb43993f/embed?autostart=1&autospin=0.15&camera=0&ui_controls=0&ui_infos=0&ui_stop=0&ui_watermark=0&ui_help=0&ui_settings=0&ui_vr=0&ui_fullscreen=0&ui_annotations=0&ui_hint=0&dnt=1"
-          className={styles.sketchfabIframe}
-        />
       </div>
 
       <section ref={heroRef} className={styles.hero} id="hero-section">

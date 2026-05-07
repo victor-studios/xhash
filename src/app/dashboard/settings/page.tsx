@@ -155,19 +155,33 @@ export default function SettingsPage() {
       return;
     }
     
-    // Save wallet settings to Supabase profile
-    const { error } = await supabase
-      .from('profiles')
-      .update({ wallet_network: paymentMethod, wallet_address: walletAddress })
-      .eq('id', user.id);
+    try {
+      // Save wallet settings to Supabase profile
+      const { data, error } = await supabase
+        .from('profiles')
+        .upsert({ 
+          id: user.id, 
+          wallet_network: paymentMethod, 
+          wallet_address: walletAddress 
+        })
+        .select();
 
-    if (error) {
-      toast({ variant: 'error', title: 'Save Failed', message: 'Could not save wallet settings.' });
-      return;
+      if (error) {
+        toast({ variant: 'error', title: 'Save Failed', message: error.message || 'Could not save wallet settings.' });
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        toast({ variant: 'error', title: 'Save Failed', message: 'Profile not found or permission denied.' });
+        return;
+      }
+
+      setWithdrawPassword('');
+      toast({ variant: 'success', title: 'Withdraw Settings Saved', message: 'Your withdrawal preferences have been updated.' });
+    } catch (err: any) {
+      console.error(err);
+      toast({ variant: 'error', title: 'Error', message: 'An unexpected error occurred while saving.' });
     }
-
-    setWithdrawPassword('');
-    toast({ variant: 'success', title: 'Withdraw Settings Saved', message: 'Your withdrawal preferences have been updated.' });
   };
 
   const handleSaveSecurity = async () => {

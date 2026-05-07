@@ -67,7 +67,13 @@ export default function ReferralsPage() {
     }
   }, [user?.id, authLoading]);
 
-  const referralLink = `https://xhashgpu.com/r/${affiliateCode}`;
+  const [referralLink, setReferralLink] = useState('');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && affiliateCode !== '...') {
+      setReferralLink(`${window.location.origin}/register?r=${affiliateCode}`);
+    }
+  }, [affiliateCode]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(referralLink);

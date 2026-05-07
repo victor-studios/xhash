@@ -20,7 +20,7 @@ interface AuthContextType {
   isLoggedIn: boolean;
   loading: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  register: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  register: (email: string, password: string, affiliateCode?: string) => Promise<{ success: boolean; error?: string }>;
   verifyOtp: (email: string, token: string, type: 'signup' | 'recovery' | 'email_change') => Promise<{ success: boolean; error?: string }>;
   resetPassword: (email: string) => Promise<{ success: boolean; error?: string }>;
   updatePassword: (password: string) => Promise<{ success: boolean; error?: string }>;
@@ -108,11 +108,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const register = async (email: string, password: string) => {
+  const register = async (email: string, password: string, affiliateCode?: string) => {
     try {
       const { error } = await supabase.auth.signUp({ 
         email, 
         password,
+        options: {
+          data: {
+            affiliate_code: affiliateCode
+          }
+        }
       });
       if (error) return { success: false, error: error.message };
       return { success: true };
@@ -156,8 +161,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const { error } = await supabase
         .from('profiles')
-        .update(updates)
-        .eq('id', user.id);
+        .upsert({ id: user.id, ...updates });
       
       if (error) {
         if (error.code === '23505') return { success: false, error: 'Username is already taken' };

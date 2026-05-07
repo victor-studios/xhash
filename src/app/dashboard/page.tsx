@@ -108,7 +108,8 @@ export default function DashboardPage() {
   }, [user?.id, authLoading]);
 
   const handleCopy = () => {
-    const affiliateUrl = `https://xhashgpu.com/r/${profile?.affiliate_code || 'default'}`;
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://xhashgpu.com';
+    const affiliateUrl = `${origin}/register?r=${profile?.affiliate_code || 'default'}`;
     navigator.clipboard.writeText(affiliateUrl);
     toast({ variant: 'success', title: 'Copied!', message: 'Affiliate link copied to clipboard.' });
   };
@@ -341,7 +342,7 @@ export default function DashboardPage() {
       <div className="affiliate-bar">
         <div className="affiliate-bar-label">Affiliate Link :</div>
         <div className="affiliate-bar-url">
-          https://xhashgpu.com/r/{profile?.affiliate_code || 'default'}
+          {(typeof window !== 'undefined' ? window.location.origin : 'https://xhashgpu.com')}/register?r={profile?.affiliate_code || 'default'}
         </div>
         <button className="affiliate-bar-copy" onClick={handleCopy} aria-label="Copy affiliate link" id="copy-affiliate-link">
           <Copy size={18} />

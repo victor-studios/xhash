@@ -180,15 +180,15 @@ export default function DepositPage() {
                   </div>
 
                   <p className="dash-note">
-                    Note: The minimum deposit $100<br />
+                    Note: The minimum deposit $10<br />
                     Please fill in the TXID / Transaction ID / Hash number after the transfer is completed.
                   </p>
 
                   <button
                     className="dash-btn-primary"
                     onClick={() => {
-                      if (!amount || parseFloat(amount) < 100) {
-                        toast({ variant: 'error', title: 'Invalid Amount', message: 'Minimum deposit is $100.' });
+                      if (!amount || parseFloat(amount) < 10) {
+                        toast({ variant: 'error', title: 'Invalid Amount', message: 'Minimum deposit is $10.' });
                         return;
                       }
                       
