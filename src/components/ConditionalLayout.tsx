@@ -13,10 +13,9 @@ export function ConditionalFooter() {
 
 export function ConditionalMain({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isDashboard = pathname.startsWith('/dashboard');
   const isAdmin = pathname.startsWith('/admin');
 
-  const style = (isAdmin || isDashboard) 
+  const style = isAdmin 
     ? { paddingTop: '0px' } 
     : { paddingTop: 'calc(var(--navbar-height) + var(--ticker-height, 32px))' };
 
